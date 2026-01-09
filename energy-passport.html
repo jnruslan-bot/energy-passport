@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Энергопаспорт</title>
+
+<style>
+table {
+  border-collapse: collapse;
+  min-width: 1600px;
+}
+
+th, td {
+  border: 1px solid #666;
+  text-align: center;
+  padding: 4px;
+}
+
+input, select {
+  width: 95%;
+}
+
+/* ===== ПАРАМЕТРЫ ЗДАНИЯ ===== */
+
+.params-box {
+  display: flex;
+  gap: 40px;
+  align-items: flex-end;
+  padding: 12px;
+  background: #f5f5f5;
+  border: 1px dashed #999;
+}
+
+.param-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+}
+
+.param-field label {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.param-field select {
+  padding: 4px;
+}
+</style>
+
+</head>
+
+<body>
+<div style="margin-bottom: 12px;">
+  <button onclick="location.href='dashboard.html'">← Назад</button>
+  <button onclick="location.href='index.html'">🏠 На главную</button>
+</div>
+
+<h1>Энергопаспорт — промышленное предприятие</h1>
+<button id="addRowBtn">＋ Добавить здание</button>
+<button onclick="exportExcel()">📊 Экспорт в Excel</button>
+<button onclick="exportPDF()">📄 Экспорт в PDF</button>
+<div style="overflow-x:auto">
+<table>
+<thead>
+  <tr>
+    <th rowspan="2">№<br>п/п</th>
+    <th rowspan="2">Наименование / назначение здания</th>
+    <th rowspan="2">Год ввода в эксплуатацию / износ, %</th>
+    <th rowspan="2">Отапливаемая площадь, м²</th>
+    <th rowspan="2">Периметр, м</th>
+    <th rowspan="2">Высота, м</th>
+    <th rowspan="2">Внутренняя температура, °C</th>
+
+    <th colspan="4">
+      Приведённое сопротивление теплопередаче, м²·°C/Вт
+    </th>
+
+    <th colspan="2">
+      Удельная отопительная характеристика, Вт/м³·°C
+    </th>
+
+    <th colspan="2">
+      Суммарный годовой расход тепловой энергии, Гкал/год
+    </th>
+
+    <th rowspan="2">
+      Отклонение фактического (расчётного) значения<br>
+      удельной отопительной характеристики от нормативной, %
+    </th>
+
+    <th rowspan="2">Параметры</th>
+  </tr>
+
+  <tr>
+    <th>Стены</th>
+    <th>Пол</th>
+    <th>Покрытие</th>
+    <th>Окна</th>
+
+    <th>Фактическая<br>(расчётная)</th>
+    <th>Нормативная</th>
+
+    <th>На отопление<br>и вентиляцию</th>
+    <th>На систему ГВС</th>
+  </tr>
+</thead>
+
+
+<tbody id="industrialBody"></tbody>
+</table>
+</div>
+
+<script type="module">
+import { cities, qNormTable, rNormTable } from "./data/reference-data.js";
+
+import {
+  getQnorm,
+  calculateQFact,
+  calculateBuildingVolume,
+  calculateHeatingEnergy,
+  calculateHotWaterEnergy,
+  calculateRpr              // ← ДОБАВИЛИ
+} from "./calc/calc/heat-calculations.js";
+
+
+
+const tbody = document.getElementById("industrialBody");
+let rowCount = 0;
+
+// ===============================
+// Пересчёт строки
+// ===============================
+function recalcRow(row) {
+  const cityName = row.dataset.city;
+  if (!cityName) return;
+
+  const city = cities.find(c => c.name === cityName);
+  if (!city) return;
+
+  const qNormCell = row.querySelector('[data-col="qNorm"]');
+  const qFactCell = row.querySelector('[data-col="qFact"]');
+  const QheatCell = row.querySelector('[data-col="Qheat"]');
+
+  const qNorm = parseFloat(qNormCell.textContent);
+  const deviation = parseFloat(
+    row.querySelector('[data-col="deviation"] input')?.value
+  );
+
+  if (!Number.isFinite(qNorm)) return;
+  const qFact = calculateQFact(qNorm, deviation);
+  if (!Number.isFinite(qFact)) return;
+
+  qFactCell.textContent = qFact.toFixed(2);
+// ===== Rпр =====
+const purpose = row.dataset.purpose;
+
+const rCells = {
+  walls:   row.children[7],   // Стены
+  floor:   row.children[8],   // Пол
+  roof:    row.children[9],   // Покрытие
+  windows: row.children[10]   // Окна
+};
+
+if (purpose) {
+  const R = calculateRpr({
+    purpose,
+    qNorm,
+    qFact,
+    rNormTable
+  });
+
+  if (R) {
+    rCells.walls.textContent   = R.walls.toFixed(2);
+    rCells.floor.textContent   = R.floor.toFixed(2);
+    rCells.roof.textContent    = R.roof.toFixed(2);
+    rCells.windows.textContent = R.windows.toFixed(2);
+  }
+}
+
+  const area = parseFloat(
+    row.querySelector('[data-col="area"] input')?.value
+  );
+  const height = parseFloat(
+    row.querySelector('[data-col="height"] input')?.value
+  );
+
+  const volume = calculateBuildingVolume(area, height);
+  if (!Number.isFinite(volume)) return;
+// ===== ОТОПЛЕНИЕ =====
+const Qheat = calculateHeatingEnergy({
+  qFact,
+  volume,
+  gsop: city.gsop
+});
+
+if (Number.isFinite(Qheat)) {
+  QheatCell.textContent = Qheat.toFixed(2);
+}
+
+  // ===== ГВС =====
+const QgvsCell = row.querySelector('[data-col="Qgvs"]');
+
+const Qgvs = calculateHotWaterEnergy({
+  area
+});
+
+if (Number.isFinite(Qgvs)) {
+  QgvsCell.textContent = Qgvs.toFixed(2);
+}
+
+}
+function collectFilledRows() {
+  const rows = [];
+
+  document.querySelectorAll("#industrialBody tr").forEach(row => {
+    const area = row.querySelector('[data-col="area"] input')?.value;
+    if (!area || Number(area) <= 0) return;
+
+    const get = col =>
+      row.querySelector(`[data-col="${col}"]`)?.textContent?.trim() || "";
+
+    const getInput = col =>
+      row.querySelector(`[data-col="${col}"] input`)?.value || "";
+
+    rows.push({
+      "Наименование здания": row.children[1].querySelector("input")?.value || "",
+      "Год / износ": row.children[2].querySelector("input")?.value || "",
+      "Площадь, м²": area,
+      "Периметр, м": row.children[4].querySelector("input")?.value || "",
+      "Высота, м": row.children[5].querySelector("input")?.value || "",
+      "Город": row.dataset.city || "",
+      "Назначение": row.dataset.purpose || "",
+
+      "R стены": row.children[7].textContent,
+      "R пол": row.children[8].textContent,
+      "R покрытие": row.children[9].textContent,
+      "R окна": row.children[10].textContent,
+
+      "q факт": get("qFact"),
+      "q норм": get("qNorm"),
+
+      "Q отопление, Гкал/год": get("Qheat"),
+      "Q ГВС, Гкал/год": get("Qgvs"),
+
+      "Отклонение, %": getInput("deviation")
+    });
+  });
+
+  return rows;
+}
+function exportExcel() {
+  const data = collectFilledRows();
+
+  if (!data.length) {
+    alert("Нет заполненных зданий для выгрузки");
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  ws["!cols"] = Object.keys(data[0]).map(key => ({
+    wch: Math.min(
+      Math.max(key.length, ...data.map(r => String(r[key]).length)) + 2,
+      40
+    )
+  }));
+
+  ws["!freeze"] = { ySplit: 1 };
+
+  XLSX.utils.book_append_sheet(wb, ws, "Энергопаспорт");
+
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `Энергопаспорт_${date}.xlsx`);
+}
+function exportPDF() {
+  const rows = collectFilledRows();
+  if (!rows.length) {
+    alert("Нет заполненных зданий для выгрузки");
+    return;
+  }
+
+  const table = document.querySelector("table").cloneNode(true);
+
+  // Удаляем пустые строки
+  table.querySelectorAll("tbody tr").forEach(tr => {
+    const area = tr.querySelector('[data-col="area"] input')?.value;
+    if (!area || Number(area) <= 0) tr.remove();
+  });
+
+  // input → span
+  table.querySelectorAll("input, button").forEach(el => {
+    const span = document.createElement("span");
+    span.textContent = el.value || "";
+    el.replaceWith(span);
+  });
+
+  // ✅ КРИТИЧЕСКИЕ СТИЛИ ДЛЯ PDF
+  table.style.width = "100%";
+  table.style.minWidth = "0";
+  table.style.fontSize = "8.5px";
+  table.style.tableLayout = "fixed";
+
+  const wrapper = document.createElement("div");
+  wrapper.style.padding = "5px";
+  wrapper.innerHTML = `
+    <h2 style="text-align:center; margin-bottom:8px">
+      Энергопаспорт — промышленное предприятие
+    </h2>
+  `;
+  wrapper.appendChild(table);
+
+  const opt = {
+    margin: [3, 3, 3, 3],
+    filename: `Энергопаспорт_${new Date().toISOString().slice(0,10)}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
+  };
+
+  html2pdf().set(opt).from(wrapper).save();
+}
+
+// ===============================
+// Добавление строки
+// ===============================
+function addRow() {
+  rowCount++;
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+  <td>${rowCount}</td>
+
+  <td><input placeholder="Наименование здания"></td>
+  <td><input placeholder="Год / износ %"></td>
+
+  <td data-col="area"><input type="number"></td>
+  <td><input type="number"></td>
+  <td data-col="height"><input type="number"></td>
+  <td data-col="tInside"><input type="number"></td>
+
+  <!-- Rпр -->
+  <td></td> <!-- стены -->
+  <td></td> <!-- пол -->
+  <td></td> <!-- покрытие -->
+  <td></td> <!-- окна -->
+
+  <!-- q -->
+  <td data-col="qFact"></td>
+  <td data-col="qNorm"></td>
+
+  <!-- Qгод -->
+  <td data-col="Qheat"></td>
+  <td data-col="Qgvs"></td>
+
+
+  <td data-col="deviation"><input type="number"></td>
+
+ <td>
+  <button type="button" class="btn-params">⚙</button>
+  <button type="button" class="btn-delete">✖</button>
+</td>
+
+`;
+
+  tbody.appendChild(tr);
+
+  tr.querySelectorAll("input").forEach(i =>
+    i.addEventListener("input", () => recalcRow(tr))
+  );
+
+  tr.querySelector(".btn-params").onclick = () => toggleParams(tr);
+
+tr.querySelector(".btn-delete").onclick = () => {
+  if (confirm("Удалить здание?")) {
+    const next = tr.nextElementSibling;
+    if (next?.classList.contains("params-row")) next.remove();
+    tr.remove();
+  }
+};
+
+}
+
+// ===============================
+// Параметры здания
+// ===============================
+function toggleParams(row) {
+  let pRow = row.nextElementSibling;
+  if (pRow?.classList.contains("params-row")) {
+    pRow.remove();
+    return;
+  }
+
+  pRow = document.createElement("tr");
+  pRow.className = "params-row";
+  pRow.innerHTML = `
+    <td colspan="100%">
+      <div class="params-box">
+  <div class="param-field">
+    <label>Город</label>
+    <select class="city"></select>
+  </div>
+
+  <div class="param-field">
+    <label>Назначение</label>
+    <select class="purpose">
+      <option>Производственное</option>
+      <option>Складское</option>
+      <option>Административно-бытовое</option>
+      <option>Вспомогательное</option>
+    </select>
+  </div>
+</div>
+
+    </td>
+  `;
+  row.after(pRow);
+
+  const citySel = pRow.querySelector(".city");
+  cities.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c.name;
+    o.textContent = c.name;
+    citySel.appendChild(o);
+  });
+// ===== УСТАНАВЛИВАЕМ ГОРОД ПО УМОЛЧАНИЮ =====
+citySel.selectedIndex = 0;
+row.dataset.city = citySel.value;
+
+const city = cities[0];
+const purpose = pRow.querySelector(".purpose").value;
+row.dataset.purpose = purpose;
+
+// сразу считаем qнорм
+const qNorm = getQnorm({ city, purpose, qNormTable });
+
+if (qNorm !== null) {
+  row.querySelector('[data-col="qNorm"]').textContent = qNorm.toFixed(2);
+}
+
+  citySel.onchange = () => {
+    row.dataset.city = citySel.value;
+    const city = cities.find(c => c.name === citySel.value);
+    const purpose = pRow.querySelector(".purpose").value;
+
+    const qNorm = getQnorm({ city, purpose, qNormTable });
+    if (qNorm !== null) {
+      row.querySelector('[data-col="qNorm"]').textContent = qNorm.toFixed(2);
+    }
+    recalcRow(row);
+  };
+
+  pRow.querySelector(".purpose").onchange = e => {
+    row.dataset.purpose = e.target.value;
+    const city = cities.find(c => c.name === row.dataset.city);
+    const qNorm = getQnorm({ city, purpose: e.target.value, qNormTable });
+    if (qNorm !== null) {
+      row.querySelector('[data-col="qNorm"]').textContent = qNorm.toFixed(2);
+    }
+    recalcRow(row);
+  };
+}
+
+document.getElementById("addRowBtn").onclick = addRow;
+addRow();
+// 👇 делаем доступной из HTML
+window.exportExcel = exportExcel;
+window.exportPDF   = exportPDF;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
+</body>
+</html>

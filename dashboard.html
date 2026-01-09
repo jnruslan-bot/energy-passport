@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Рабочая зона</title>
+</head>
+<body>
+
+<h1>Рабочая зона</h1>
+<p>Пользователь авторизован</p>
+<button onclick="goToEnergyPassport()">Энергопаспорт</button>
+<a id="adminLink" href="admin.html" style="display:none;">Администратор</a>
+<br><br>
+
+<button id="logoutBtn">Выйти</button>
+
+<script type="module" src="guard.js"></script>
+</body>
+</html>
+<script>
+  function goToEnergyPassport() {
+    window.location.href = "energy-passport-select.html";
+  }
+</script>
+

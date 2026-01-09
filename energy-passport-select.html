@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Выбор типа энергопаспорта</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.buttons {
+  margin-top: 30px;
+}
+
+button {
+  padding: 12px 20px;
+  margin-right: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<button onclick="location.href='dashboard.html'">← Назад в рабочую зону</button>
+
+<h1>Выберите тип энергопаспорта</h1>
+
+<div class="buttons">
+  <button onclick="location.href='energy-passport.html'">
+    🏭 Промышленное предприятие
+  </button>
+
+  <button onclick="location.href='energy-passport-nonindustrial.html'">
+    🏢 Непромышленное предприятие
+  </button>
+</div>
+
+</body>
+</html>
