@@ -229,9 +229,7 @@ function collectFilledRows() {
       "Площадь, м²": area,
       "Периметр, м": row.children[4].querySelector("input")?.value || "",
       "Высота, м": row.children[5].querySelector("input")?.value || "",
-      "Город": row.dataset.city || "",
-      "Назначение": row.dataset.purpose || "",
-
+      
       "R стены": row.children[7].textContent,
       "R пол": row.children[8].textContent,
       "R покрытие": row.children[9].textContent,
@@ -282,6 +280,10 @@ function exportPDF() {
   }
 
   const table = document.querySelector("table").cloneNode(true);
+// ❌ Удаляем последний столбец (Параметры)
+table.querySelectorAll("tr").forEach(tr => {
+  tr.lastElementChild?.remove();
+});
 
   // Удаляем пустые строки
   table.querySelectorAll("tbody tr").forEach(tr => {
