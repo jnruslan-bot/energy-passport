@@ -1,5 +1,5 @@
 // ter-consumption.js
-import { TER_REFERENCE } from "./data/ter-reference.js";
+import { TER_REFERENCE } from "./ter-reference.js";
 
 const STORAGE_KEY = "ter_matrix_v2";
 
