@@ -9,6 +9,8 @@
 <h1>Рабочая зона</h1>
 <p>Пользователь авторизован</p>
 <button onclick="goToEnergyPassport()">Энергопаспорт</button>
+<button onclick="goToTER()">Потребление ТЭР</button>
+
 <a id="adminLink" href="admin.html" style="display:none;">Администратор</a>
 <br><br>
 
@@ -21,5 +23,9 @@
   function goToEnergyPassport() {
     window.location.href = "energy-passport-select.html";
   }
+  function goToTER() {
+  window.location.href = "ter-consumption.html";
+}
+
 </script>
 
