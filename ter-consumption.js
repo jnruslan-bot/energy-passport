@@ -453,7 +453,7 @@ function buildDeltaBoxHtml(labels, dataArr) {
   `;
 }
 
-function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel) {
+function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptionTitle = title) {
   const card = document.createElement("div");
   card.className = "chartCard";
 
@@ -464,6 +464,15 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel) {
   const deltaWrap = document.createElement("div");
   deltaWrap.innerHTML = buildDeltaBoxHtml(labels, dataArr);
   card.appendChild(deltaWrap);
+
+  // Описание под конкретным графиком
+  const desc = document.createElement("div");
+  desc.className = "chartAutoDescription";
+  desc.innerHTML = `
+    <b>Описание:</b>
+    <p>${escapeHtml(trendDescription(descriptionTitle, yLabel, labels, dataArr))}</p>
+  `;
+  card.appendChild(desc);
 
   gridEl.appendChild(card);
 
@@ -541,8 +550,6 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
 // RENDER: line charts + yearly pies
 // =====================
 function renderAllVisuals(years) {
-  renderDescriptionsOnPage(years);
-
   if (!window.Chart) return;
 
   destroyAllCharts();
@@ -579,9 +586,35 @@ function renderLineCharts(years) {
     section.appendChild(grid);
     chartsWrap.appendChild(section);
 
-    addLineChartCard(grid, `b${bi}_nat`,   "В натуральном выражении", labels, nat,  unit);
-    addLineChartCard(grid, `b${bi}_money`, "В денежном выражении",    labels, mon,  "тг.");
-    addLineChartCard(grid, `b${bi}_cost`,  "Себестоимость",           labels, cost, `тг/${unit}`);
+addLineChartCard(
+  grid,
+  `b${bi}_nat`,
+  "В натуральном выражении",
+  labels,
+  nat,
+  unit,
+  `${name}: в натуральном выражении`
+);
+
+addLineChartCard(
+  grid,
+  `b${bi}_money`,
+  "В денежном выражении",
+  labels,
+  mon,
+  "тг.",
+  `${name}: в денежном выражении`
+);
+
+addLineChartCard(
+  grid,
+  `b${bi}_cost`,
+  "Себестоимость",
+  labels,
+  cost,
+  `тг/${unit}`,
+  `${name}: себестоимость`
+);
   });
 
   // ===== Графики ИТОГО =====
@@ -620,9 +653,35 @@ function renderLineCharts(years) {
   totSection.appendChild(totGrid);
   chartsWrap.appendChild(totSection);
 
-  addLineChartCard(totGrid, "tot_tut",   "В условном топливе",       labels, totalTut,   "т.у.т");
-  addLineChartCard(totGrid, "tot_money", "В денежном выражении",     labels, totalMoney, "тг.");
-  addLineChartCard(totGrid, "tot_cost",  "Себестоимость",            labels, totalCost,  "тг/т.у.т");
+ addLineChartCard(
+  totGrid,
+  "tot_tut",
+  "В условном топливе",
+  labels,
+  totalTut,
+  "т.у.т",
+  "ИТОГО: в условном топливе"
+);
+
+addLineChartCard(
+  totGrid,
+  "tot_money",
+  "В денежном выражении",
+  labels,
+  totalMoney,
+  "тг.",
+  "ИТОГО: в денежном выражении"
+);
+
+addLineChartCard(
+  totGrid,
+  "tot_cost",
+  "Себестоимость",
+  labels,
+  totalCost,
+  "тг/т.у.т",
+  "ИТОГО: себестоимость"
+);
 }
 
 function renderYearlyStructure(years) {
