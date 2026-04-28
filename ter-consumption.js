@@ -457,9 +457,21 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
   const card = document.createElement("div");
   card.className = "chartCard";
 
+  // Название графика над карточкой
+  const chartHeading = document.createElement("h4");
+  chartHeading.className = "chartCardTitle";
+  chartHeading.textContent = `График. ${descriptionTitle}`;
+  card.appendChild(chartHeading);
+
   const canvas = document.createElement("canvas");
   canvas.id = id;
   card.appendChild(canvas);
+
+  // Название таблицы отклонений
+  const tableHeading = document.createElement("div");
+  tableHeading.className = "deltaTableTitle";
+  tableHeading.textContent = `Таблица отклонений. ${descriptionTitle}`;
+  card.appendChild(tableHeading);
 
   const deltaWrap = document.createElement("div");
   deltaWrap.innerHTML = buildDeltaBoxHtml(labels, dataArr);
@@ -490,8 +502,20 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { title: { display: true, text: title } },
-      scales: { y: { title: { display: true, text: yLabel } } }
+      plugins: {
+        title: {
+          display: true,
+          text: descriptionTitle
+        }
+      },
+      scales: {
+        y: {
+          title: {
+            display: true,
+            text: yLabel
+          }
+        }
+      }
     }
   });
 
@@ -967,11 +991,17 @@ function makeDeltaAoa(title, unit, labels, vals) {
   return aoa;
 }
 function makeDeltaAoaWithDescription(title, unit, labels, vals, descriptionTitle) {
-  const aoa = makeDeltaAoa(title, unit, labels, vals);
+  const fullTitle = descriptionTitle || title;
+  const aoa = [];
+
+  aoa.push([`Таблица отклонений. ${fullTitle}`]);
+  aoa.push([]);
+
+  aoa.push(...makeDeltaAoa(title, unit, labels, vals));
 
   aoa.push([
     "Описание",
-    trendDescription(descriptionTitle || title, unit, labels, vals)
+    trendDescription(fullTitle, unit, labels, vals)
   ]);
 
   aoa.push([]);
@@ -980,7 +1010,11 @@ function makeDeltaAoaWithDescription(title, unit, labels, vals, descriptionTitle
 }
 function buildMainTableAoa(years) {
   const header = ["№", "Наименование ТЭР", "Потребление", "Ед.измерения", ...years.map(String)];
-  const aoa = [header];
+  const aoa = [
+    [`Таблица. Потребление топливно-энергетических ресурсов за ${years[0]}–${years[years.length - 1]} гг.`],
+    [],
+    header
+  ];
 
   blocks.forEach((b, bi) => {
     const unit = getUnit(b) || "";
@@ -1050,7 +1084,7 @@ function buildMainTableAoa(years) {
 }
 function buildYearlyStructureAoa(years) {
   const aoa = [];
-  aoa.push(["СТРУКТУРА ПО ГОДАМ (как в круговых диаграммах)"]);
+  aoa.push([`Таблица. Структура потребления ТЭР по годам за ${years[0]}–${years[years.length - 1]} гг.`]);
   aoa.push([]);
 
   years.forEach((y) => {
@@ -1148,7 +1182,7 @@ function buildShareSeries(years, mode /* "tut" | "money" */) {
 function buildStructureDeltaAoa(years) {
   const labels = years.map(String);
   const aoa = [];
-  aoa.push(["Δ СТРУКТУРЫ (доли, %) по годам"]);
+  aoa.push([`Таблица. Изменение структуры потребления ТЭР по годам за ${years[0]}–${years[years.length - 1]} гг.`]);
   aoa.push([]);
 
   const tutShares = buildShareSeries(years, "tut");
