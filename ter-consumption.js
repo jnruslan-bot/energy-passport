@@ -966,7 +966,18 @@ function makeDeltaAoa(title, unit, labels, vals) {
   aoa.push([]);
   return aoa;
 }
+function makeDeltaAoaWithDescription(title, unit, labels, vals, descriptionTitle) {
+  const aoa = makeDeltaAoa(title, unit, labels, vals);
 
+  aoa.push([
+    "Описание",
+    trendDescription(descriptionTitle || title, unit, labels, vals)
+  ]);
+
+  aoa.push([]);
+
+  return aoa;
+}
 function buildMainTableAoa(years) {
   const header = ["№", "Наименование ТЭР", "Потребление", "Ед.измерения", ...years.map(String)];
   const aoa = [header];
@@ -1379,13 +1390,40 @@ async function downloadXlsx() {
         return (n !== null && n !== 0 && m !== null) ? (m / n) : null;
       });
 
-      const aoa = [];
-      aoa.push(...makeDeltaAoa("В натуральном выражении", unit, labels, nat));
-      aoa.push(...makeDeltaAoa("В денежном выражении", "тг.", labels, mon));
-      aoa.push(...makeDeltaAoa("Себестоимость", `тг/${unit}`, labels, cost));
+const aoa = [];
+
+aoa.push(...makeDeltaAoaWithDescription(
+  "В натуральном выражении",
+  unit,
+  labels,
+  nat,
+  `${name}: в натуральном выражении`
+));
+
+aoa.push(...makeDeltaAoaWithDescription(
+  "В денежном выражении",
+  "тг.",
+  labels,
+  mon,
+  `${name}: в денежном выражении`
+));
+
+aoa.push(...makeDeltaAoaWithDescription(
+  "Себестоимость",
+  `тг/${unit}`,
+  labels,
+  cost,
+  `${name}: себестоимость`
+));
 
       const ws = window.XLSX.utils.aoa_to_sheet(aoa);
-      ws["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 14 }];
+ws["!cols"] = [
+  { wch: 18 },
+  { wch: 120 },
+  { wch: 18 },
+  { wch: 14 },
+  { wch: 14 }
+];
       window.XLSX.utils.book_append_sheet(wb, ws, safeSheetName(name));
     });
 
@@ -1414,13 +1452,40 @@ async function downloadXlsx() {
       return (t !== null && t !== 0 && m !== null) ? (m / t) : null;
     });
 
-    const aoaTot = [];
-    aoaTot.push(...makeDeltaAoa("ИТОГО: В условном топливе", "т.у.т", labels, totalTut));
-    aoaTot.push(...makeDeltaAoa("ИТОГО: В денежном выражении", "тг.", labels, totalMoney));
-    aoaTot.push(...makeDeltaAoa("ИТОГО: Себестоимость", "тг/т.у.т", labels, totalCost));
+const aoaTot = [];
+
+aoaTot.push(...makeDeltaAoaWithDescription(
+  "ИТОГО: В условном топливе",
+  "т.у.т",
+  labels,
+  totalTut,
+  "ИТОГО: в условном топливе"
+));
+
+aoaTot.push(...makeDeltaAoaWithDescription(
+  "ИТОГО: В денежном выражении",
+  "тг.",
+  labels,
+  totalMoney,
+  "ИТОГО: в денежном выражении"
+));
+
+aoaTot.push(...makeDeltaAoaWithDescription(
+  "ИТОГО: Себестоимость",
+  "тг/т.у.т",
+  labels,
+  totalCost,
+  "ИТОГО: себестоимость"
+));
 
     const wsTot = window.XLSX.utils.aoa_to_sheet(aoaTot);
-    wsTot["!cols"] = [{ wch: 10 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 14 }];
+wsTot["!cols"] = [
+  { wch: 18 },
+  { wch: 120 },
+  { wch: 18 },
+  { wch: 14 },
+  { wch: 14 }
+];
     window.XLSX.utils.book_append_sheet(wb, wsTot, "ИТОГО_Δ");
 
     // [ВСТАВЛЯЕШЬ СЮДА БЛОК "Структура" и "Структура_Δ"]
@@ -1437,17 +1502,6 @@ async function downloadXlsx() {
       { wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 14 },
     ];
 window.XLSX.utils.book_append_sheet(wb, wsStructDelta, "Структура_Δ");
-
-// 6) Автоматические описания динамики
-const aoaDescriptions = buildDescriptionsAoa(years);
-const wsDescriptions = window.XLSX.utils.aoa_to_sheet(aoaDescriptions);
-
-wsDescriptions["!cols"] = [
-  { wch: 32 },
-  { wch: 120 },
-];
-
-window.XLSX.utils.book_append_sheet(wb, wsDescriptions, "Описание");
 
 const s = Number(startYearEl.value);
 const e = Number(endYearEl.value);
