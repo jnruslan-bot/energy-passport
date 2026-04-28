@@ -362,7 +362,6 @@ function recalcAll(years) {
 // charts + Δ tables
 // =====================
 function scheduleChartsUpdate(years) {
-  if (!window.Chart) return;
   clearTimeout(chartsTimer);
   chartsTimer = setTimeout(() => renderAllVisuals(years), 150);
 }
@@ -542,6 +541,8 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
 // RENDER: line charts + yearly pies
 // =====================
 function renderAllVisuals(years) {
+  renderDescriptionsOnPage(years);
+
   if (!window.Chart) return;
 
   destroyAllCharts();
@@ -1099,6 +1100,182 @@ function buildStructureDeltaAoa(years) {
 
   return aoa;
 }
+// =====================
+// Автоописания для таблиц и Excel
+// =====================
+function trendDescription(title, unit, years, values) {
+  const valid = years
+    .map((y, i) => ({
+      year: y,
+      value: values[i]
+    }))
+    .filter(x => x.value !== null && x.value !== undefined && Number.isFinite(Number(x.value)));
+
+  if (valid.length < 2) {
+    return `По показателю «${title}» данных недостаточно для анализа динамики. Необходимо заполнить значения минимум за два года.`;
+  }
+
+  const first = valid[0];
+  const last = valid[valid.length - 1];
+
+  const diff = last.value - first.value;
+  const diffPct = first.value !== 0 ? (diff / first.value * 100) : null;
+
+  const max = valid.reduce((a, b) => b.value > a.value ? b : a);
+  const min = valid.reduce((a, b) => b.value < a.value ? b : a);
+
+  let trendText = "";
+
+  if (diff > 0) {
+    trendText = `наблюдается увеличение на ${fmt2(diff)} ${unit}, или на ${fmt2(diffPct)} %.`;
+  } else if (diff < 0) {
+    trendText = `наблюдается снижение на ${fmt2(Math.abs(diff))} ${unit}, или на ${fmt2(Math.abs(diffPct))} %.`;
+  } else {
+    trendText = `значение осталось без изменения.`;
+  }
+
+  const emptyYears = years.filter((y, i) => {
+    const v = values[i];
+    return v === null || v === undefined || !Number.isFinite(Number(v));
+  });
+
+  const warning = emptyYears.length
+    ? ` Следует учитывать, что по годам ${emptyYears.join(", ")} данные отсутствуют, поэтому итоговая динамика может быть неполной.`
+    : "";
+
+  return `По показателю «${title}» за период ${first.year}–${last.year} гг. ${trendText} Максимальное значение зафиксировано в ${max.year} году — ${fmt2(max.value)} ${unit}, минимальное — в ${min.year} году — ${fmt2(min.value)} ${unit}.${warning}`;
+}
+
+function buildDescriptionsAoa(years) {
+  const labels = years.map(String);
+  const aoa = [];
+
+  aoa.push(["ОПИСАНИЕ ДИНАМИКИ ПОТРЕБЛЕНИЯ ТЭР"]);
+  aoa.push([]);
+
+  blocks.forEach((b, bi) => {
+    const name = b.resourceName || `ТЭР_${bi + 1}`;
+    const unit = getUnit(b) || "ед.";
+
+    const nat = years.map(y => getCellValueOrNull(b, y, "natural"));
+    const mon = years.map(y => getCellValueOrNull(b, y, "money"));
+    const cost = years.map((_, i) => {
+      const n = nat[i];
+      const m = mon[i];
+      return (n !== null && n !== 0 && m !== null) ? (m / n) : null;
+    });
+
+    aoa.push([name]);
+    aoa.push([
+      "В натуральном выражении",
+      trendDescription(`${name}: в натуральном выражении`, unit, labels, nat)
+    ]);
+    aoa.push([
+      "В денежном выражении",
+      trendDescription(`${name}: в денежном выражении`, "тг.", labels, mon)
+    ]);
+    aoa.push([
+      "Себестоимость",
+      trendDescription(`${name}: себестоимость`, `тг/${unit}`, labels, cost)
+    ]);
+    aoa.push([]);
+  });
+
+  const totalTut = years.map(y => {
+    let sum = 0;
+    let has = false;
+
+    blocks.forEach(b => {
+      const nat = getCellValueOrNull(b, y, "natural");
+      const k = getK(b);
+
+      if (nat !== null && k > 0) {
+        sum += nat * k;
+        has = true;
+      }
+    });
+
+    return has ? sum : null;
+  });
+
+  const totalMoney = years.map(y => {
+    let sum = 0;
+    let has = false;
+
+    blocks.forEach(b => {
+      const m = getCellValueOrNull(b, y, "money");
+
+      if (m !== null) {
+        sum += m;
+        has = true;
+      }
+    });
+
+    return has ? sum : null;
+  });
+
+  const totalCost = years.map((_, i) => {
+    const t = totalTut[i];
+    const m = totalMoney[i];
+
+    return (t !== null && t !== 0 && m !== null) ? (m / t) : null;
+  });
+
+  aoa.push(["ИТОГО"]);
+  aoa.push([
+    "В условном топливе",
+    trendDescription("ИТОГО: в условном топливе", "т.у.т", labels, totalTut)
+  ]);
+  aoa.push([
+    "В денежном выражении",
+    trendDescription("ИТОГО: в денежном выражении", "тг.", labels, totalMoney)
+  ]);
+  aoa.push([
+    "Себестоимость",
+    trendDescription("ИТОГО: себестоимость", "тг/т.у.т", labels, totalCost)
+  ]);
+
+  return aoa;
+}
+
+function renderDescriptionsOnPage(years) {
+  if (!chartsWrap) return;
+
+  let block = document.getElementById("terDescriptionsBlock");
+
+  if (!block) {
+    block = document.createElement("div");
+    block.id = "terDescriptionsBlock";
+    block.style.margin = "18px 0";
+    block.style.padding = "12px";
+    block.style.border = "1px solid #d0d7de";
+    block.style.borderRadius = "8px";
+    block.style.background = "#f8fafc";
+
+    chartsWrap.parentNode.insertBefore(block, chartsWrap);
+  }
+
+  const aoa = buildDescriptionsAoa(years);
+
+  let html = `<h3 style="margin-top:0;">Описание динамики потребления ТЭР</h3>`;
+
+  aoa.forEach(row => {
+    if (row.length === 1 && row[0]) {
+      html += `<h4 style="margin:14px 0 6px;">${escapeHtml(row[0])}</h4>`;
+    }
+
+    if (row.length >= 2) {
+      html += `
+        <div style="margin-bottom:10px; padding:10px; background:#fff; border-left:4px solid #2563eb;">
+          <b>${escapeHtml(row[0])}</b>
+          <p style="margin:6px 0 0; line-height:1.45;">${escapeHtml(row[1])}</p>
+        </div>
+      `;
+    }
+  });
+
+  block.innerHTML = html;
+}
 
 async function downloadXlsx() {
   if (!window.XLSX) {
@@ -1200,11 +1377,22 @@ async function downloadXlsx() {
     wsStructDelta["!cols"] = [
       { wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 14 },
     ];
-    window.XLSX.utils.book_append_sheet(wb, wsStructDelta, "Структура_Δ");
+window.XLSX.utils.book_append_sheet(wb, wsStructDelta, "Структура_Δ");
 
-    const s = Number(startYearEl.value);
-    const e = Number(endYearEl.value);
-    window.XLSX.writeFile(wb, `Потребление_ТЭР_${s}-${e}.xlsx`);
+// 6) Автоматические описания динамики
+const aoaDescriptions = buildDescriptionsAoa(years);
+const wsDescriptions = window.XLSX.utils.aoa_to_sheet(aoaDescriptions);
+
+wsDescriptions["!cols"] = [
+  { wch: 32 },
+  { wch: 120 },
+];
+
+window.XLSX.utils.book_append_sheet(wb, wsDescriptions, "Описание");
+
+const s = Number(startYearEl.value);
+const e = Number(endYearEl.value);
+window.XLSX.writeFile(wb, `Потребление_ТЭР_${s}-${e}.xlsx`);
 
   } finally {
     if (downloadXlsxBtn) downloadXlsxBtn.disabled = false;
