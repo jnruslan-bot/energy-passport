@@ -496,9 +496,15 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
       datasets: [{
         label: title,
         data: dataArr,
-        spanGaps: true
+        spanGaps: true,
+        pointRadius: 4,
+        pointHoverRadius: 6
       }]
     },
+
+    // Подписи значений на графике
+    plugins: window.ChartDataLabels ? [window.ChartDataLabels] : [],
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -506,6 +512,25 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
         title: {
           display: true,
           text: descriptionTitle
+        },
+
+        // Настройки отображения чисел над точками
+        datalabels: {
+          display: true,
+          anchor: "end",
+          align: "top",
+          offset: 4,
+          color: "#111",
+          font: {
+            weight: "bold",
+            size: 11
+          },
+          formatter: (value) => {
+            if (value === null || value === undefined || value === "") return "";
+            const n = Number(value);
+            if (!Number.isFinite(n)) return "";
+            return fmt2(n);
+          }
         }
       },
       scales: {
@@ -547,12 +572,36 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
         borderWidth: 1
       }]
     },
+
+    // Подписи значений на круговой диаграмме
+    plugins: window.ChartDataLabels ? [window.ChartDataLabels] : [],
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         title: { display: true, text: title },
         legend: { position: "bottom" },
+
+        // Значения на секторах круговой диаграммы
+        datalabels: {
+          display: true,
+          color: "#111",
+          font: {
+            weight: "bold",
+            size: 11
+          },
+          formatter: (value, context) => {
+            const arr = context.chart.data.datasets[0].data || [];
+            const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+            const n = Number(value);
+            if (!Number.isFinite(n) || n <= 0 || sum <= 0) return "";
+
+            const p = n / sum * 100;
+            return `${fmt2(n)} (${fmt2(p)}%)`;
+          }
+        },
+
         tooltip: {
           callbacks: {
             label: (ctx) => {
