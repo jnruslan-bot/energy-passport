@@ -624,7 +624,30 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
       maintainAspectRatio: false,
       plugins: {
         title: { display: true, text: title },
-        legend: { position: "bottom" },
+        legend: {
+  position: "bottom",
+  labels: {
+    generateLabels(chart) {
+      const dataset = chart.data.datasets[0];
+      const data = dataset.data || [];
+      const total = data.reduce((a, b) => a + (Number(b) || 0), 0);
+
+      return chart.data.labels.map((label, i) => {
+        const value = Number(data[i]) || 0;
+        const pct = total > 0 ? (value / total * 100) : 0;
+
+        return {
+          text: `${label} (${fmt2(pct)}%)`,
+          fillStyle: dataset.backgroundColor[i],
+          strokeStyle: dataset.borderColor[i],
+          lineWidth: 1,
+          hidden: !chart.getDataVisibility(i),
+          index: i
+        };
+      });
+    }
+  }
+},
 
         // Значения на секторах круговой диаграммы
         datalabels: {
@@ -1527,7 +1550,105 @@ function renderDescriptionsOnPage(years) {
 
   block.innerHTML = html;
 }
+function buildOtherBreakdownAoa(years) {
+  const aoa = [];
 
+  aoa.push([`Таблица. Расшифровка сектора «Прочее» по годам за ${years[0]}–${years[years.length - 1]} гг.`]);
+  aoa.push([]);
+
+  years.forEach((y) => {
+    const rows = blocks.map((b) => {
+      const name = b.resourceName || "—";
+      const k = getK(b);
+
+      const nat = getCellValueOrNull(b, y, "natural");
+      const mon = getCellValueOrNull(b, y, "money");
+
+      const tut = (nat !== null && k > 0) ? nat * k : 0;
+      const money = (mon !== null && mon > 0) ? mon : 0;
+
+      return { name, tut, money };
+    });
+
+    const tutItems = rows
+      .filter(r => r.tut > 0)
+      .map(r => ({ label: r.name, value: +r.tut.toFixed(2) }));
+
+    const moneyItems = rows
+      .filter(r => r.money > 0)
+      .map(r => ({ label: r.name, value: +r.money.toFixed(2) }));
+
+    const tutGrouped = groupSmallPieItems(
+      tutItems.map(x => x.label),
+      tutItems.map(x => x.value),
+      2
+    );
+
+    const moneyGrouped = groupSmallPieItems(
+      moneyItems.map(x => x.label),
+      moneyItems.map(x => x.value),
+      2
+    );
+
+    // ===== т.у.т =====
+    if (tutGrouped.otherItems.length) {
+      aoa.push([`Год: ${y}`]);
+      aoa.push([`Расшифровка сектора «Прочее» — т.у.т`]);
+      aoa.push(["Энергоресурс", "т.у.т", "Доля в итоге, %", "Доля внутри «Прочее», %"]);
+
+      tutGrouped.otherItems.forEach(item => {
+        const pctOfTotal = tutGrouped.total > 0 ? item.value / tutGrouped.total * 100 : 0;
+        const pctOfOther = tutGrouped.otherTotal > 0 ? item.value / tutGrouped.otherTotal * 100 : 0;
+
+        aoa.push([
+          item.label,
+          Number(item.value),
+          Number(pctOfTotal),
+          Number(pctOfOther)
+        ]);
+      });
+
+      aoa.push([
+        "ИТОГО «Прочее»",
+        Number(tutGrouped.otherTotal),
+        tutGrouped.total > 0 ? Number(tutGrouped.otherTotal / tutGrouped.total * 100) : "",
+        100
+      ]);
+
+      aoa.push([]);
+    }
+
+    // ===== тг. =====
+    if (moneyGrouped.otherItems.length) {
+      aoa.push([`Год: ${y}`]);
+      aoa.push([`Расшифровка сектора «Прочее» — тг.`]);
+      aoa.push(["Энергоресурс", "тг.", "Доля в итоге, %", "Доля внутри «Прочее», %"]);
+
+      moneyGrouped.otherItems.forEach(item => {
+        const pctOfTotal = moneyGrouped.total > 0 ? item.value / moneyGrouped.total * 100 : 0;
+        const pctOfOther = moneyGrouped.otherTotal > 0 ? item.value / moneyGrouped.otherTotal * 100 : 0;
+
+        aoa.push([
+          item.label,
+          Number(item.value),
+          Number(pctOfTotal),
+          Number(pctOfOther)
+        ]);
+      });
+
+      aoa.push([
+        "ИТОГО «Прочее»",
+        Number(moneyGrouped.otherTotal),
+        moneyGrouped.total > 0 ? Number(moneyGrouped.otherTotal / moneyGrouped.total * 100) : "",
+        100
+      ]);
+
+      aoa.push([]);
+    }
+  });
+
+  return aoa;
+}
 async function downloadXlsx() {
   if (!window.XLSX) {
     alert("XLSX-библиотека не загрузилась. Проверь подключение xlsx.full.min.js в HTML.");
@@ -1683,7 +1804,20 @@ wsTot["!cols"] = [
       { wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 14 },
     ];
 window.XLSX.utils.book_append_sheet(wb, wsStructDelta, "Структура_Δ");
+const aoaOther = buildOtherBreakdownAoa(years);
 
+if (aoaOther.length > 2) {
+  const wsOther = window.XLSX.utils.aoa_to_sheet(aoaOther);
+
+  wsOther["!cols"] = [
+    { wch: 28 },
+    { wch: 16 },
+    { wch: 18 },
+    { wch: 24 }
+  ];
+
+  window.XLSX.utils.book_append_sheet(wb, wsOther, "Прочее");
+}
 const s = Number(startYearEl.value);
 const e = Number(endYearEl.value);
 window.XLSX.writeFile(wb, `Потребление_ТЭР_${s}-${e}.xlsx`);
@@ -1768,15 +1902,28 @@ function chartHasFilledData(canvas) {
   });
 }
 async function downloadChartsPng() {
-  const canvases = [
-    ...document.querySelectorAll("#chartsWrap canvas"),
-    ...document.querySelectorAll("#yearlyWrap canvas")
-  ].filter(canvas => {
-    if (!canvas.width || !canvas.height) return false;
+  if (!window.html2canvas) {
+    alert("html2canvas не загрузился. Проверь подключение библиотеки в HTML.");
+    return;
+  }
+
+  const cards = [
+    ...document.querySelectorAll("#chartsWrap .chartCard"),
+    ...document.querySelectorAll("#yearlyWrap .yearCard")
+  ];
+
+  if (!cards.length) {
+    alert("Графиков не найдено.");
+    return;
+  }
+
+  const filledCards = cards.filter(card => {
+    const canvas = card.querySelector("canvas");
+    if (!canvas) return false;
     return chartHasFilledData(canvas);
   });
 
-  if (!canvases.length) {
+  if (!filledCards.length) {
     alert("Заполненных графиков для скачивания не найдено.");
     return;
   }
@@ -1785,12 +1932,22 @@ async function downloadChartsPng() {
   const e = Number(endYearEl.value);
   const prefix = `Потребление_ТЭР_${s}-${e}_`;
 
-  canvases.forEach((canvas) => {
+  for (const card of filledCards) {
+    const canvas = card.querySelector("canvas");
+    if (!canvas) continue;
+
     const base = chartFileLabelByCanvasId(canvas.id);
     const name = safeFileName(prefix + base) + ".png";
-    const dataUrl = canvasToPngWithWhiteBg(canvas);
+
+    const imgCanvas = await window.html2canvas(card, {
+      backgroundColor: "#ffffff",
+      scale: 2,
+      useCORS: true
+    });
+
+    const dataUrl = imgCanvas.toDataURL("image/png");
     downloadBlobUrl(dataUrl, name);
-  });
+  }
 }
 
 // =====================
