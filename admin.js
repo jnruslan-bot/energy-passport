@@ -1,5 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -42,8 +46,9 @@ onAuthStateChanged(auth, async (user) => {
 
   tbody.innerHTML = "";
 
-  snap.forEach(d => {
+snap.forEach(d => {
   const u = d.data();
+  const email = u.email || "";
 
   const blockBtn =
     d.id === auth.currentUser.uid
@@ -55,13 +60,19 @@ onAuthStateChanged(auth, async (user) => {
       ? "—"
       : `<button onclick="deleteUser('${d.id}')">Удалить</button>`;
 
+  const resetBtn =
+    d.id === auth.currentUser.uid
+      ? "—"
+      : `<button onclick="resetUserPassword('${email}')">Сбросить пароль</button>`;
+
   tbody.innerHTML += `
     <tr>
-      <td>${u.email}</td>
-      <td>${u.status}</td>
+      <td>${email}</td>
+      <td>${u.status || ""}</td>
       <td>
         ${blockBtn}
         ${deleteBtn}
+        ${resetBtn}
       </td>
     </tr>`;
 });
@@ -81,6 +92,24 @@ window.deleteUser = async (uid) => {
   await deleteDoc(doc(db, "users", uid));
   alert("Пользователь удалён");
   location.reload();
+};
+// 🔑 Сброс пароля
+window.resetUserPassword = async (email) => {
+  if (!email) {
+    alert("У пользователя не указан email.");
+    return;
+  }
+
+  const ok = confirm(`Отправить письмо для сброса пароля пользователю ${email}?`);
+  if (!ok) return;
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert(`Письмо для сброса пароля отправлено на: ${email}`);
+  } catch (error) {
+    console.error("Ошибка сброса пароля:", error);
+    alert("Не удалось отправить письмо для сброса пароля. Подробности смотри в Console.");
+  }
 };
 window.goBack = () => {
   window.location.href = "dashboard.html";
