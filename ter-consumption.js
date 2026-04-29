@@ -1750,17 +1750,42 @@ function downloadBlobUrl(url, filename) {
   a.click();
   a.remove();
 }
+function chartHasFilledData(canvas) {
+  if (!canvas || !canvas.id) return false;
 
+  const chart = chartInstances.get(canvas.id);
+  if (!chart) return false;
+
+  const datasets = chart.data?.datasets || [];
+
+  return datasets.some(dataset => {
+    const data = dataset.data || [];
+
+    return data.some(value => {
+      const n = Number(value);
+      return Number.isFinite(n) && n > 0;
+    });
+  });
+}
 async function downloadChartsPng() {
-  const canvases = document.querySelectorAll("#chartsWrap canvas, #yearlyWrap canvas");
-  if (!canvases.length) return alert("Графиков не найдено.");
+  const canvases = [
+    ...document.querySelectorAll("#chartsWrap canvas"),
+    ...document.querySelectorAll("#yearlyWrap canvas")
+  ].filter(canvas => {
+    if (!canvas.width || !canvas.height) return false;
+    return chartHasFilledData(canvas);
+  });
+
+  if (!canvases.length) {
+    alert("Заполненных графиков для скачивания не найдено.");
+    return;
+  }
 
   const s = Number(startYearEl.value);
   const e = Number(endYearEl.value);
   const prefix = `Потребление_ТЭР_${s}-${e}_`;
 
   canvases.forEach((canvas) => {
-    if (!canvas.width || !canvas.height) return;
     const base = chartFileLabelByCanvasId(canvas.id);
     const name = safeFileName(prefix + base) + ".png";
     const dataUrl = canvasToPngWithWhiteBg(canvas);
