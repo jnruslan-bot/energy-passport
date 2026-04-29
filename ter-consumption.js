@@ -135,7 +135,45 @@ function pieColors(count) {
   }
   return { bg, br };
 }
+function groupSmallPieItems(labels, values, thresholdPct = 2) {
+  const total = values.reduce((sum, v) => sum + (Number(v) || 0), 0);
 
+  const mainLabels = [];
+  const mainValues = [];
+  const otherItems = [];
+
+  labels.forEach((label, index) => {
+    const value = Number(values[index]) || 0;
+    const pct = total > 0 ? (value / total) * 100 : 0;
+
+    // Если доля меньше порога — уходит в "Прочее"
+    if (value > 0 && pct < thresholdPct) {
+      otherItems.push({
+        label,
+        value,
+        pct
+      });
+    } else if (value > 0) {
+      mainLabels.push(label);
+      mainValues.push(value);
+    }
+  });
+
+  const otherTotal = otherItems.reduce((sum, item) => sum + item.value, 0);
+
+  if (otherTotal > 0) {
+    mainLabels.push("Прочее");
+    mainValues.push(+otherTotal.toFixed(2));
+  }
+
+  return {
+    labels: mainLabels,
+    values: mainValues,
+    otherItems,
+    total,
+    otherTotal
+  };
+}
 // =====================
 // table build
 // =====================
@@ -548,6 +586,11 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
 }
 
 function addPieCard(containerEl, id, title, labels, values, unitLabel) {
+  const grouped = groupSmallPieItems(labels, values, 2);
+
+  labels = grouped.labels;
+  values = grouped.values;
+
   const card = document.createElement("div");
   card.className = "yearCard";
 
@@ -595,9 +638,14 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
             const arr = context.chart.data.datasets[0].data || [];
             const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
             const n = Number(value);
+
             if (!Number.isFinite(n) || n <= 0 || sum <= 0) return "";
 
             const p = n / sum * 100;
+
+            // Чтобы подписи не налезали: очень маленькие сектора не подписываем на самом круге
+            if (p < 3) return "";
+
             return `${fmt2(n)} (${fmt2(p)}%)`;
           }
         },
@@ -605,10 +653,10 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
         tooltip: {
           callbacks: {
             label: (ctx) => {
-              const v = ctx.raw ?? 0;
+              const v = Number(ctx.raw ?? 0);
               const sum = values.reduce((a, b) => a + (Number(b) || 0), 0);
               const p = sum > 0 ? (v / sum * 100) : 0;
-              return `${ctx.label}: ${fmt2(Number(v))} (${fmt2(p)}%)`;
+              return `${ctx.label}: ${fmt2(v)} ${unitLabel} (${fmt2(p)}%)`;
             }
           }
         }
@@ -617,6 +665,56 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
   });
 
   chartInstances.set(id, chart);
+
+  // Расшифровка сектора "Прочее"
+  if (grouped.otherItems.length) {
+    const otherBox = document.createElement("div");
+    otherBox.className = "otherBreakdown";
+
+    const rows = grouped.otherItems.map(item => {
+      const pctOfTotal = grouped.total > 0
+        ? item.value / grouped.total * 100
+        : 0;
+
+      const pctOfOther = grouped.otherTotal > 0
+        ? item.value / grouped.otherTotal * 100
+        : 0;
+
+      return `
+        <tr>
+          <td>${escapeHtml(item.label)}</td>
+          <td>${fmt2(item.value)}</td>
+          <td>${fmt2(pctOfTotal)}%</td>
+          <td>${fmt2(pctOfOther)}%</td>
+        </tr>
+      `;
+    }).join("");
+
+    otherBox.innerHTML = `
+      <div class="otherTitle">Расшифровка сектора «Прочее»</div>
+      <table class="deltaTable">
+        <thead>
+          <tr>
+            <th>Энергоресурс</th>
+            <th>${escapeHtml(unitLabel)}</th>
+            <th>Доля в итоге, %</th>
+            <th>Доля внутри «Прочее», %</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr>
+            <th>ИТОГО «Прочее»</th>
+            <th>${fmt2(grouped.otherTotal)}</th>
+            <th>${grouped.total > 0 ? fmt2(grouped.otherTotal / grouped.total * 100) : "—"}%</th>
+            <th>100%</th>
+          </tr>
+        </tbody>
+      </table>
+    `;
+
+    card.appendChild(otherBox);
+  }
 }
 
 // =====================
