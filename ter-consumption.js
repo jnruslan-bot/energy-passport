@@ -257,25 +257,43 @@ function makeTerSelect(selectedName, blockIndex) {
   `;
 }
 
-function inputCell({ bi, rowKey, year, value, editable }) {
-  const ro = editable ? "" : "readonly";
-  const cls = editable ? "" : "readonly";
+function inputCell({ bi, rowKey, year, value }) {
   return `
-    <td class="yearCell">
+    <td class="yearCell editableCell">
       <input
-        class="${cls}"
         type="text"
         inputmode="decimal"
         data-bi="${bi}"
         data-row="${rowKey}"
         data-year="${year}"
         value="${escapeHtml(value ?? "")}"
-        ${ro}
       />
     </td>
   `;
 }
-
+function autoCell({ bi, rowKey, year, value = "" }) {
+  return `
+    <td class="yearCell autoCell">
+      <span
+        class="autoValue"
+        data-bi="${bi}"
+        data-row="${rowKey}"
+        data-year="${year}"
+      >${escapeHtml(value ?? "")}</span>
+    </td>
+  `;
+}
+function totalAutoCell({ key, year, value = "" }) {
+  return `
+    <td class="yearCell autoCell">
+      <span
+        class="autoValue"
+        data-total="${key}"
+        data-year="${year}"
+      >${escapeHtml(value ?? "")}</span>
+    </td>
+  `;
+}
 function buildBody(years) {
   tbody.innerHTML = "";
 
@@ -301,12 +319,23 @@ function buildBody(years) {
 
       tr.innerHTML += `<td class="col-unit" data-unit="${bi}:${rt.key}">${unitText}</td>`;
 
-      years.forEach(y => {
-        let v = "";
-        if (rt.key === "natural") v = block.values[y]?.natural ?? "";
-        if (rt.key === "money") v = block.values[y]?.money ?? "";
-        tr.innerHTML += inputCell({ bi, rowKey: rt.key, year: y, value: v, editable: rt.editable });
-      });
+years.forEach(y => {
+  let v = "";
+
+  if (rt.key === "natural") {
+    v = block.values[y]?.natural ?? "";
+    tr.innerHTML += inputCell({ bi, rowKey: rt.key, year: y, value: v });
+  }
+
+  if (rt.key === "money") {
+    v = block.values[y]?.money ?? "";
+    tr.innerHTML += inputCell({ bi, rowKey: rt.key, year: y, value: v });
+  }
+
+  if (rt.key === "tut" || rt.key === "cost") {
+    tr.innerHTML += autoCell({ bi, rowKey: rt.key, year: y, value: "" });
+  }
+});
 
       if (rowIdx === 0) {
         tr.innerHTML += `
@@ -338,13 +367,13 @@ function buildBody(years) {
     tr.innerHTML += `<td class="col-type"><b>${trt.label}</b></td>`;
     tr.innerHTML += `<td class="col-unit"><b>${trt.unit}</b></td>`;
 
-    years.forEach(y => {
-      tr.innerHTML += `
-        <td class="yearCell">
-          <input class="readonly" type="text" readonly data-total="${trt.key}" data-year="${y}" />
-        </td>
-      `;
-    });
+years.forEach(y => {
+  tr.innerHTML += totalAutoCell({
+    key: trt.key,
+    year: y,
+    value: ""
+  });
+});
 
     tr.innerHTML += `<td></td>`;
     tbody.appendChild(tr);
@@ -406,12 +435,12 @@ function recalcBlock(bi, years) {
     const mon = toNum(block.values[y]?.money);
 
     const tut = (nat > 0 && k > 0) ? fmt(nat * k) : "";
-    const tutInp = tbody.querySelector(`input[data-bi="${bi}"][data-row="tut"][data-year="${y}"]`);
-    if (tutInp) tutInp.value = tut;
+    const tutEl = tbody.querySelector(`span[data-bi="${bi}"][data-row="tut"][data-year="${y}"]`);
+    if (tutEl) tutEl.textContent = tut;
 
     const cost = (nat > 0 && mon > 0) ? fmt(mon / nat) : "";
-    const costInp = tbody.querySelector(`input[data-bi="${bi}"][data-row="cost"][data-year="${y}"]`);
-    if (costInp) costInp.value = cost;
+    const costEl = tbody.querySelector(`span[data-bi="${bi}"][data-row="cost"][data-year="${y}"]`);
+    if (costEl) costEl.textContent = cost;
   });
 }
 
@@ -428,19 +457,26 @@ function recalcTotals(years) {
       const mon = getCellValueOrNull(b, y, "money");
       const k = getK(b);
 
-      if (mon !== null) { totalMoney += mon; hasMoney = true; }
-      if (nat !== null && k > 0) { totalTut += nat * k; hasTut = true; }
+      if (mon !== null) {
+        totalMoney += mon;
+        hasMoney = true;
+      }
+
+      if (nat !== null && k > 0) {
+        totalTut += nat * k;
+        hasTut = true;
+      }
     });
 
-    const tutInp = tbody.querySelector(`input[data-total="tut"][data-year="${y}"]`);
-    const monInp = tbody.querySelector(`input[data-total="money"][data-year="${y}"]`);
-    const costInp = tbody.querySelector(`input[data-total="cost"][data-year="${y}"]`);
+    const tutEl = tbody.querySelector(`span[data-total="tut"][data-year="${y}"]`);
+    const monEl = tbody.querySelector(`span[data-total="money"][data-year="${y}"]`);
+    const costEl = tbody.querySelector(`span[data-total="cost"][data-year="${y}"]`);
 
-    if (tutInp) tutInp.value = hasTut ? fmt(totalTut) : "";
-    if (monInp) monInp.value = hasMoney ? fmt(totalMoney) : "";
+    if (tutEl) tutEl.textContent = hasTut ? fmt(totalTut) : "";
+    if (monEl) monEl.textContent = hasMoney ? fmt(totalMoney) : "";
 
     const totalCost = (hasTut && totalTut !== 0 && hasMoney) ? (totalMoney / totalTut) : null;
-    if (costInp) costInp.value = (totalCost !== null && totalCost > 0) ? fmt(totalCost) : "";
+    if (costEl) costEl.textContent = (totalCost !== null && totalCost > 0) ? fmt(totalCost) : "";
   });
 }
 
