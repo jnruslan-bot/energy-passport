@@ -438,10 +438,120 @@
     return "public";
   }
 
-  function getMainBuildingType() {
-    return normalizeBuildingType();
-  }
+function getMainBuildingType() {
+  return getBuildingChoice().main || normalizeBuildingType();
+}
+function getBuildingChoice() {
+  const raw = String($("buildingTypeSelect")?.value ?? "").trim();
 
+  const map = {
+    residential: {
+      main: "residential",
+      table9: "residential",
+      group: "g1",
+      publicKind: null,
+      educationKind: null,
+      industrialKind: null
+    },
+
+    public_admin: {
+      main: "public",
+      table9: "admin",
+      group: "g2",
+      publicKind: "admin",
+      educationKind: null,
+      industrialKind: null
+    },
+
+    public_other: {
+      main: "public",
+      table9: "other_public",
+      group: "g2",
+      publicKind: "other_public",
+      educationKind: null,
+      industrialKind: null
+    },
+
+    public_service_warehouse: {
+      main: "public",
+      table9: "service_warehouse",
+      group: "g2",
+      publicKind: "service_warehouse",
+      educationKind: null,
+      industrialKind: null
+    },
+
+    education_school: {
+      main: "education",
+      table9: "other_public",
+      group: "g1",
+      publicKind: null,
+      educationKind: "school",
+      industrialKind: null
+    },
+
+    education_preschool: {
+      main: "education",
+      table9: "preschool",
+      group: "g1",
+      publicKind: null,
+      educationKind: "preschool",
+      industrialKind: null
+    },
+
+    medical: {
+      main: "medical",
+      table9: "medical",
+      group: "g1",
+      publicKind: null,
+      educationKind: null,
+      industrialKind: null
+    },
+
+    industrial_production: {
+      main: "industrial",
+      table9: "service_warehouse",
+      group: "g3",
+      publicKind: null,
+      educationKind: null,
+      industrialKind: "production"
+    },
+
+    industrial_warehouse: {
+      main: "industrial",
+      table9: "service_warehouse",
+      group: "g3",
+      publicKind: null,
+      educationKind: null,
+      industrialKind: "warehouse"
+    }
+  };
+
+  return map[raw] || {
+    main: normalizeBuildingType(),
+    table9: null,
+    group: null,
+    publicKind: null,
+    educationKind: null,
+    industrialKind: null
+  };
+}
+
+function setSelectValueIfExists(id, value) {
+  const el = $(id);
+  if (!el || value == null) return;
+
+  const hasOption = Array.from(el.options || []).some(opt => opt.value === value);
+  if (hasOption) el.value = value;
+}
+
+function syncSubtypeFromBuildingType() {
+  const choice = getBuildingChoice();
+
+  setSelectValueIfExists("s1_public_kind", choice.publicKind);
+  setSelectValueIfExists("s1_edu_kind", choice.educationKind);
+  setSelectValueIfExists("s1_industrial_kind", choice.industrialKind);
+}
   // ============================================================================
   // Показ/скрытие подтипов
   // ============================================================================
@@ -451,14 +561,21 @@
     wrap.style.display = visible ? "" : "none";
   }
 
-  function updateSubtypeVisibility() {
-    const t = getMainBuildingType();
-    setWrapVisible("wrap_edu_kind", t === "education");
-    setWrapVisible("wrap_public_kind", t === "public");
-    setWrapVisible("wrap_industrial_kind", t === "industrial");
-    setWrapVisible("wrap_industrial_regime", t === "industrial");
-    setWrapVisible("wrap_Lvent_proj", t !== "residential");
-  }
+function updateSubtypeVisibility() {
+  const t = getMainBuildingType();
+
+  // Подтипы уже зашиты в buildingTypeSelect,
+  // поэтому отдельные уточняющие списки пользователю не показываем.
+  setWrapVisible("wrap_edu_kind", false);
+  setWrapVisible("wrap_public_kind", false);
+  setWrapVisible("wrap_industrial_kind", false);
+
+  // Режим влажности для промышленного можно оставить отдельно.
+  setWrapVisible("wrap_industrial_regime", t === "industrial");
+
+  // Проектный расход вентиляции нужен для нежилых зданий.
+  setWrapVisible("wrap_Lvent_proj", t !== "residential");
+}
 
   // ============================================================================
   // tв: авто, но можно руками
@@ -852,13 +969,16 @@
   // ============================================================================
   // Таблица 4: вычисления R0тр
   // ============================================================================
-  function getBuildingGroup() {
-    const v = getMainBuildingType();
-    if (v === "industrial") return "g3";
-    if (v === "public") return "g2";
-    if (v === "residential" || v === "education" || v === "medical") return "g1";
-    return null;
-  }
+function getBuildingGroup() {
+  const choice = getBuildingChoice();
+  if (choice.group) return choice.group;
+
+  const v = getMainBuildingType();
+  if (v === "industrial") return "g3";
+  if (v === "public") return "g2";
+  if (v === "residential" || v === "education" || v === "medical") return "g1";
+  return null;
+}
 
   function sortedKeysNum(obj) {
     return Object.keys(obj).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
@@ -1001,7 +1121,10 @@
     return null;
   }
 
-  function pickTable9RowKey() {
+function pickTable9RowKey() {
+    const choice = getBuildingChoice();
+    if (choice.table9) return choice.table9;
+
     const type = getMainBuildingType();
 
     const bt = getSelectedValueAndText("buildingTypeSelect");
@@ -1725,6 +1848,7 @@ function writePvValues(_pvNorm, pvProj) {
   // Основной расчёт
   // ============================================================================
   function calc() {
+    syncSubtypeFromBuildingType();
     updateSubtypeVisibility();
 
     // релевантность табл.2 по выбору типов
@@ -1945,8 +2069,9 @@ lockField("s4_pv_proj");
       "s3_basement_proj", "s3_drive_proj", "s3_ground_proj"
     ].forEach(disableField);
 
-    // 9) Видимость подтипов при старте
-    updateSubtypeVisibility();
+// 9) Синхронизация скрытых подтипов и видимость при старте
+syncSubtypeFromBuildingType();
+updateSubtypeVisibility();
 
     // 10) Режим Aж/Aр сразу + релевантность табл.2
     applyAreaInputsMode();
@@ -1962,13 +2087,14 @@ lockField("s4_pv_proj");
     if (citySel && String(citySel.value ?? "").trim() !== "") applyCityClimate(citySel.value);
 
     // 12) События: тип здания (и подтипы)
-    safeOn("buildingTypeSelect", "change", () => {
-      updateSubtypeVisibility();
-      applyAreaInputsMode();
-      applyGeomFieldRelevance();
-      applyTvAutoIfAllowed();
-      recalcAll();
-    });
+safeOn("buildingTypeSelect", "change", () => {
+  syncSubtypeFromBuildingType();
+  updateSubtypeVisibility();
+  applyAreaInputsMode();
+  applyGeomFieldRelevance();
+  applyTvAutoIfAllowed();
+  recalcAll();
+});
 
     ["educationSubtypeSelect", "s1_edu_kind", "publicSubtypeSelect", "s1_public_kind", "industrialUseSelect", "s1_industrial_kind"]
       .forEach((id) => safeOn(id, "change", () => { applyTvAutoIfAllowed(); applyGeomFieldRelevance(); recalcAll(); }));

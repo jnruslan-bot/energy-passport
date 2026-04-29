@@ -103,13 +103,22 @@
     <div class="control">
       <label for="buildingTypeSelect">Тип здания (для норм R₀ и qₒт,тр)</label>
       <select id="buildingTypeSelect">
-        <option value="">— выберите тип —</option>
-        <option value="residential">Жилое (квартиры/общежитие/гостиница)</option>
-        <option value="public">Общественное/административное</option>
-        <option value="education">Школа/детсад/учебное</option>
-        <option value="medical">Медицинское</option>
-        <option value="industrial">Производственное/складское</option>
-      </select>
+  <option value="">— выберите тип —</option>
+
+  <option value="residential">Жилое</option>
+
+  <option value="public_admin">Общественное/административное (офисы)</option>
+  <option value="public_other">Общественное прочее</option>
+  <option value="public_service_warehouse">Общественное: сервис/склад</option>
+
+  <option value="education_school">Учебное</option>
+  <option value="education_preschool">Детский сад / ДОУ</option>
+
+  <option value="medical">Медицинское</option>
+
+  <option value="industrial_production">Промышленное/производственное</option>
+  <option value="industrial_warehouse">Промышленное/складское</option>
+</select>
     </div>
 
     <!-- Этажность (Табл. 9) -->
@@ -121,21 +130,21 @@
     <!-- Education subtype -->
     <div class="control" id="wrap_edu_kind" style="display:none">
       <label for="s1_edu_kind">Education: уточнение</label>
-      <select id="s1_edu_kind">
-        <option value="school" selected>Школа / учебное</option>
-        <option value="kindergarten">Детсад / дошкольное</option>
-      </select>
+<select id="s1_edu_kind">
+  <option value="school" selected>Школа / учебное</option>
+  <option value="preschool">Детсад / дошкольное</option>
+</select>
     </div>
 
     <!-- Public subtype -->
     <div class="control" id="wrap_public_kind" style="display:none">
       <label for="s1_public_kind">Public: уточнение</label>
       <!-- ВАЖНО: value приведены к ключам, которые ждёт расчёт (other_public / office / service_warehouse) -->
-      <select id="s1_public_kind">
-        <option value="other_public" selected>Прочее общественное</option>
-        <option value="office">Административное (офисы)</option>
-        <option value="service_warehouse">Сервис/склад (общественное)</option>
-      </select>
+<select id="s1_public_kind">
+  <option value="other_public" selected>Прочее общественное</option>
+  <option value="admin">Административное (офисы)</option>
+  <option value="service_warehouse">Сервис/склад (общественное)</option>
+</select>
     </div>
 
     <!-- Industrial subtype -->
