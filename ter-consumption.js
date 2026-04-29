@@ -13,7 +13,10 @@ const saveBtn = document.getElementById("saveBtn");
 const loadBtn = document.getElementById("loadBtn");
 const clearBtn = document.getElementById("clearBtn");
 const addTerBtn = document.getElementById("addTerBtn");
-
+const projectSelect = document.getElementById("projectSelect");
+const newProjectBtn = document.getElementById("newProjectBtn");
+const renameProjectBtn = document.getElementById("renameProjectBtn");
+const deleteProjectBtn = document.getElementById("deleteProjectBtn");
 const thead = document.getElementById("terThead");
 const tbody = document.getElementById("terTbody");
 
@@ -25,6 +28,8 @@ const downloadXlsxBtn = document.getElementById("downloadXlsxBtn");
 const downloadChartsPngBtn = document.getElementById("downloadChartsPngBtn");
 
 const TER_STORAGE_KEY = "energy_passport_ter_current_project_v1";
+const TER_PROJECTS_KEY = "energy_passport_ter_projects_v1";
+const TER_ACTIVE_PROJECT_KEY = "energy_passport_ter_active_project_id";
 // =====================
 // DATA
 // =====================
@@ -117,7 +122,225 @@ function applyTerSaveData(data) {
   buildHead(years);
   buildBody(years);
 }
+// =====================
+// local projects storage
+// =====================
+function getProjects() {
+  try {
+    const raw = localStorage.getItem(TER_PROJECTS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    console.error("Ошибка чтения списка объектов:", e);
+    return {};
+  }
+}
 
+function setProjects(projects) {
+  localStorage.setItem(TER_PROJECTS_KEY, JSON.stringify(projects));
+}
+
+function getActiveProjectId() {
+  return localStorage.getItem(TER_ACTIVE_PROJECT_KEY) || "";
+}
+
+function setActiveProjectId(id) {
+  if (id) {
+    localStorage.setItem(TER_ACTIVE_PROJECT_KEY, id);
+  } else {
+    localStorage.removeItem(TER_ACTIVE_PROJECT_KEY);
+  }
+}
+
+function renderProjectSelect() {
+  if (!projectSelect) return;
+
+  const projects = getProjects();
+  const activeId = getActiveProjectId();
+
+  projectSelect.innerHTML = `<option value="">— выберите объект —</option>`;
+
+  Object.entries(projects)
+    .sort((a, b) => (a[1].name || "").localeCompare(b[1].name || "", "ru"))
+    .forEach(([id, project]) => {
+      const opt = document.createElement("option");
+      opt.value = id;
+      opt.textContent = project.name || "Без названия";
+
+      if (id === activeId) {
+        opt.selected = true;
+      }
+
+      projectSelect.appendChild(opt);
+    });
+}
+
+function createNewProject() {
+  const name = prompt("Введите название объекта:");
+
+  if (!name || !name.trim()) return;
+
+  const id = "obj_" + Date.now();
+  const projects = getProjects();
+
+  projects[id] = {
+    name: name.trim(),
+    ...getTerSaveData()
+  };
+
+  setProjects(projects);
+  setActiveProjectId(id);
+  renderProjectSelect();
+
+  if (projectSelect) {
+    projectSelect.value = id;
+  }
+
+  alert("Объект создан и выбран.");
+}
+
+function saveActiveProject() {
+  let activeId = projectSelect?.value || getActiveProjectId();
+
+  if (!activeId) {
+    const ok = confirm("Объект не выбран. Создать новый объект для сохранения?");
+    if (!ok) return;
+
+    const name = prompt("Введите название объекта:");
+    if (!name || !name.trim()) return;
+
+    activeId = "obj_" + Date.now();
+
+    const projects = getProjects();
+    projects[activeId] = {
+      name: name.trim(),
+      ...getTerSaveData()
+    };
+
+    setProjects(projects);
+    setActiveProjectId(activeId);
+    renderProjectSelect();
+
+    if (projectSelect) {
+      projectSelect.value = activeId;
+    }
+
+    alert(`Данные объекта «${name.trim()}» сохранены.`);
+    return;
+  }
+
+  const projects = getProjects();
+
+  if (!projects[activeId]) {
+    alert("Выбранный объект не найден. Создайте новый объект.");
+    renderProjectSelect();
+    return;
+  }
+
+  projects[activeId] = {
+    ...projects[activeId],
+    ...getTerSaveData()
+  };
+
+  setProjects(projects);
+  setActiveProjectId(activeId);
+  renderProjectSelect();
+
+  if (projectSelect) {
+    projectSelect.value = activeId;
+  }
+
+  alert(`Данные объекта «${projects[activeId].name}» сохранены.`);
+}
+
+function loadActiveProject(showAlert = true) {
+  const activeId = projectSelect?.value || getActiveProjectId();
+
+  if (!activeId) {
+    if (showAlert) alert("Объект не выбран.");
+    return;
+  }
+
+  const projects = getProjects();
+  const project = projects[activeId];
+
+  if (!project) {
+    if (showAlert) alert("Сохранённые данные по выбранному объекту не найдены.");
+    return;
+  }
+
+  setActiveProjectId(activeId);
+  applyTerSaveData(project);
+
+  if (showAlert) {
+    alert(`Данные объекта «${project.name}» восстановлены.`);
+  }
+}
+
+function renameActiveProject() {
+  const activeId = projectSelect?.value || getActiveProjectId();
+
+  if (!activeId) {
+    alert("Сначала выберите объект.");
+    return;
+  }
+
+  const projects = getProjects();
+  const project = projects[activeId];
+
+  if (!project) {
+    alert("Объект не найден.");
+    return;
+  }
+
+  const newName = prompt("Новое название объекта:", project.name || "");
+
+  if (!newName || !newName.trim()) return;
+
+  project.name = newName.trim();
+
+  setProjects(projects);
+  renderProjectSelect();
+
+  if (projectSelect) {
+    projectSelect.value = activeId;
+  }
+
+  alert("Объект переименован.");
+}
+
+function deleteActiveProject() {
+  const activeId = projectSelect?.value || getActiveProjectId();
+
+  if (!activeId) {
+    alert("Сначала выберите объект.");
+    return;
+  }
+
+  const projects = getProjects();
+  const project = projects[activeId];
+
+  if (!project) {
+    alert("Объект не найден.");
+    return;
+  }
+
+  const ok = confirm(`Удалить объект «${project.name}» и все его сохранённые данные?`);
+
+  if (!ok) return;
+
+  delete projects[activeId];
+
+  setProjects(projects);
+  setActiveProjectId("");
+
+  if (projectSelect) {
+    projectSelect.value = "";
+  }
+
+  renderProjectSelect();
+
+  alert("Объект удалён.");
+}
 function saveTerData() {
   const data = getTerSaveData();
   localStorage.setItem(TER_STORAGE_KEY, JSON.stringify(data));
@@ -1980,8 +2203,22 @@ async function downloadChartsPng() {
 // bind handlers (один раз)
 // =====================
 applyYearsBtn?.addEventListener("click", applyYears);
-saveBtn?.addEventListener("click", saveTerData);
-loadBtn?.addEventListener("click", () => loadTerData(true));
+saveBtn?.addEventListener("click", saveActiveProject);
+loadBtn?.addEventListener("click", () => loadActiveProject(true));
+
+projectSelect?.addEventListener("change", () => {
+  const selectedId = projectSelect.value;
+  setActiveProjectId(selectedId);
+
+  if (selectedId) {
+    loadActiveProject(false);
+  }
+});
+
+newProjectBtn?.addEventListener("click", createNewProject);
+renameProjectBtn?.addEventListener("click", renameActiveProject);
+deleteProjectBtn?.addEventListener("click", deleteActiveProject);
+
 clearBtn?.addEventListener("click", clearAll);
 addTerBtn?.addEventListener("click", () => addBlock(""));
 
@@ -1994,10 +2231,18 @@ downloadChartsPngBtn?.addEventListener("click", downloadChartsPng);
 // =====================
 (() => {
   const years = getYears();
+
   blocks.forEach(b => ensureBlockYears(b, years));
+
   buildHead(years);
   buildBody(years);
 
-  // Автоматически загружаем сохранённый текущий проект
-  loadTerData(false);
+  renderProjectSelect();
+
+  const activeId = getActiveProjectId();
+
+  if (activeId && projectSelect) {
+    projectSelect.value = activeId;
+    loadActiveProject(false);
+  }
 })();
