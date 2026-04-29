@@ -24,6 +24,7 @@ const downloadPdfBtn = document.getElementById("downloadPdfBtn");
 const downloadXlsxBtn = document.getElementById("downloadXlsxBtn");
 const downloadChartsPngBtn = document.getElementById("downloadChartsPngBtn");
 
+const TER_STORAGE_KEY = "energy_passport_ter_current_project_v1";
 // =====================
 // DATA
 // =====================
@@ -86,7 +87,60 @@ function getYears() {
   for (let y = s; y <= e; y++) years.push(y);
   return years;
 }
+function getTerSaveData() {
+  return {
+    startYear: startYearEl?.value || "",
+    endYear: endYearEl?.value || "",
+    blocks: blocks
+  };
+}
 
+function applyTerSaveData(data) {
+  if (!data) return;
+
+  if (data.startYear && startYearEl) {
+    startYearEl.value = data.startYear;
+  }
+
+  if (data.endYear && endYearEl) {
+    endYearEl.value = data.endYear;
+  }
+
+  if (Array.isArray(data.blocks)) {
+    blocks.length = 0;
+    blocks.push(...data.blocks);
+  }
+
+  const years = getYears();
+  blocks.forEach(b => ensureBlockYears(b, years));
+
+  buildHead(years);
+  buildBody(years);
+}
+
+function saveTerData() {
+  const data = getTerSaveData();
+  localStorage.setItem(TER_STORAGE_KEY, JSON.stringify(data));
+  alert("Данные текущего проекта сохранены.");
+}
+
+function loadTerData(showAlert = true) {
+  const raw = localStorage.getItem(TER_STORAGE_KEY);
+
+  if (!raw) {
+    if (showAlert) alert("Сохранённые данные не найдены.");
+    return;
+  }
+
+  try {
+    const data = JSON.parse(raw);
+    applyTerSaveData(data);
+    if (showAlert) alert("Данные текущего проекта загружены.");
+  } catch (error) {
+    console.error("Ошибка загрузки данных:", error);
+    if (showAlert) alert("Не удалось загрузить сохранённые данные.");
+  }
+}
 function getRef(block) {
   return TER_MAP.get(block.resourceName);
 }
@@ -993,11 +1047,15 @@ function load() {
 }
 
 function clearAll() {
-  if (!confirm("Очистить таблицу?")) return;
+  if (!confirm("Очистить таблицу и удалить сохранённые данные?")) return;
+
+  localStorage.removeItem(TER_STORAGE_KEY);
+
   const years = getYears();
   blocks.forEach(b => {
     years.forEach(y => (b.values[y] = { natural: "", money: "" }));
   });
+
   buildBody(years);
 }
 
@@ -1886,8 +1944,8 @@ async function downloadChartsPng() {
 // bind handlers (один раз)
 // =====================
 applyYearsBtn?.addEventListener("click", applyYears);
-saveBtn?.addEventListener("click", save);
-loadBtn?.addEventListener("click", load);
+saveBtn?.addEventListener("click", saveTerData);
+loadBtn?.addEventListener("click", () => loadTerData(true));
 clearBtn?.addEventListener("click", clearAll);
 addTerBtn?.addEventListener("click", () => addBlock(""));
 
@@ -1903,4 +1961,7 @@ downloadChartsPngBtn?.addEventListener("click", downloadChartsPng);
   blocks.forEach(b => ensureBlockYears(b, years));
   buildHead(years);
   buildBody(years);
+
+  // Автоматически загружаем сохранённый текущий проект
+  loadTerData(false);
 })();
