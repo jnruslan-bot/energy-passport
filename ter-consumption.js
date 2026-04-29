@@ -505,26 +505,7 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
   canvas.id = id;
   card.appendChild(canvas);
 
-  // Название таблицы отклонений
-  const tableHeading = document.createElement("div");
-  tableHeading.className = "deltaTableTitle";
-  tableHeading.textContent = `Таблица отклонений. ${descriptionTitle}`;
-  card.appendChild(tableHeading);
-
-  const deltaWrap = document.createElement("div");
-  deltaWrap.innerHTML = buildDeltaBoxHtml(labels, dataArr);
-  card.appendChild(deltaWrap);
-
-  // Описание под конкретным графиком
-  const desc = document.createElement("div");
-  desc.className = "chartAutoDescription";
-  desc.innerHTML = `
-    <b>Описание:</b>
-    <p>${escapeHtml(trendDescription(descriptionTitle, yLabel, labels, dataArr))}</p>
-  `;
-  card.appendChild(desc);
-
-  gridEl.appendChild(card);
+    gridEl.appendChild(card);
 
   const ctx = canvas.getContext("2d");
   const chart = new window.Chart(ctx, {
@@ -689,56 +670,7 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
 
   chartInstances.set(id, chart);
 
-  // Расшифровка сектора "Прочее"
-  if (grouped.otherItems.length) {
-    const otherBox = document.createElement("div");
-    otherBox.className = "otherBreakdown";
-
-    const rows = grouped.otherItems.map(item => {
-      const pctOfTotal = grouped.total > 0
-        ? item.value / grouped.total * 100
-        : 0;
-
-      const pctOfOther = grouped.otherTotal > 0
-        ? item.value / grouped.otherTotal * 100
-        : 0;
-
-      return `
-        <tr>
-          <td>${escapeHtml(item.label)}</td>
-          <td>${fmt2(item.value)}</td>
-          <td>${fmt2(pctOfTotal)}%</td>
-          <td>${fmt2(pctOfOther)}%</td>
-        </tr>
-      `;
-    }).join("");
-
-    otherBox.innerHTML = `
-      <div class="otherTitle">Расшифровка сектора «Прочее»</div>
-      <table class="deltaTable">
-        <thead>
-          <tr>
-            <th>Энергоресурс</th>
-            <th>${escapeHtml(unitLabel)}</th>
-            <th>Доля в итоге, %</th>
-            <th>Доля внутри «Прочее», %</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-          <tr>
-            <th>ИТОГО «Прочее»</th>
-            <th>${fmt2(grouped.otherTotal)}</th>
-            <th>${grouped.total > 0 ? fmt2(grouped.otherTotal / grouped.total * 100) : "—"}%</th>
-            <th>100%</th>
-          </tr>
-        </tbody>
-      </table>
-    `;
-
-    card.appendChild(otherBox);
   }
-}
 
 // =====================
 // RENDER: line charts + yearly pies
