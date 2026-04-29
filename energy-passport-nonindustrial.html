@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Энергопаспорт — здания/строения/сооружения</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 16px; }
+    h1 { margin: 0 0 10px; }
+    h2 { margin: 18px 0 8px; font-size: 18px; }
+
+    .actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+
+    table { border-collapse: collapse; width: 100%; margin: 8px 0 14px; }
+    th, td { border: 1px solid #666; padding: 6px; vertical-align: top; }
+    th { background: #f5f5f5; text-align: center; font-weight: 600; }
+    td { text-align: center; }
+    td.left { text-align: left; }
+
+    table input, table select { width: 98%; padding: 5px; box-sizing: border-box; }
+
+    /* Автозаполняемые поля (readonly) — без рамки */
+    table input[readonly]{
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      text-align: center;
+    }
+
+    /* если где-то используешь disabled */
+    table input:disabled,
+    table select:disabled{
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      color: inherit;
+    }
+
+    .note { font-size: 13px; color:#444; margin-top: -8px; }
+    .badge { display:inline-block; padding: 3px 10px; border:1px solid #333; border-radius: 999px; }
+    .muted { color:#666; font-size: 13px; }
+
+    .controls{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      padding:12px;
+      margin: 10px 0 18px;
+      border:1px solid #ddd;
+      background:#fafafa;
+      border-radius:10px;
+    }
+
+    .control{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 240px;
+    }
+
+    .control label{
+      font-size: 13px;
+      color:#444;
+    }
+
+    .control select{
+      width:100%;
+      padding:6px;
+    }
+
+    .control.right{
+      margin-left:auto;
+      min-width:120px;
+    }
+
+    .badge-wrap{
+      height: 34px;
+      display:flex;
+      align-items:center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="actions">
+    <button onclick="location.href='dashboard.html'">← Рабочая зона</button>
+    <button onclick="location.href='energy-passport-select.html'">↩ Выбор типа</button>
+  </div>
+
+  <div class="controls">
+    <div class="control">
+      <label for="citySelect">Город</label>
+      <select id="citySelect">
+        <option value="">— выберите город —</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="buildingTypeSelect">Тип здания (для норм R₀ и qₒт,тр)</label>
+      <select id="buildingTypeSelect">
+        <option value="">— выберите тип —</option>
+        <option value="residential">Жилое (квартиры/общежитие/гостиница)</option>
+        <option value="public">Общественное/административное</option>
+        <option value="education">Школа/детсад/учебное</option>
+        <option value="medical">Медицинское</option>
+        <option value="industrial">Производственное/складское</option>
+      </select>
+    </div>
+
+    <!-- Этажность (Табл. 9) -->
+    <div class="control">
+      <label for="s1_floors">Этажность (N)</label>
+      <input id="s1_floors" type="number" min="1" step="1" placeholder="например, 5">
+    </div>
+
+    <!-- Education subtype -->
+    <div class="control" id="wrap_edu_kind" style="display:none">
+      <label for="s1_edu_kind">Education: уточнение</label>
+      <select id="s1_edu_kind">
+        <option value="school" selected>Школа / учебное</option>
+        <option value="kindergarten">Детсад / дошкольное</option>
+      </select>
+    </div>
+
+    <!-- Public subtype -->
+    <div class="control" id="wrap_public_kind" style="display:none">
+      <label for="s1_public_kind">Public: уточнение</label>
+      <!-- ВАЖНО: value приведены к ключам, которые ждёт расчёт (other_public / office / service_warehouse) -->
+      <select id="s1_public_kind">
+        <option value="other_public" selected>Прочее общественное</option>
+        <option value="office">Административное (офисы)</option>
+        <option value="service_warehouse">Сервис/склад (общественное)</option>
+      </select>
+    </div>
+
+    <!-- Industrial subtype -->
+    <div class="control" id="wrap_industrial_kind" style="display:none">
+      <label for="s1_industrial_kind">Industrial: тип</label>
+      <select id="s1_industrial_kind">
+        <option value="production" selected>Производственное / технопарк</option>
+        <option value="warehouse">Склад</option>
+      </select>
+    </div>
+
+    <!-- Industrial regime -->
+    <div class="control" id="wrap_industrial_regime" style="display:none">
+      <label for="s1_industrial_regime">Industrial: режим помещений</label>
+      <!-- ВАЖНО: значение wet_moist, чтобы JS корректно различал режим -->
+      <select id="s1_industrial_regime">
+        <option value="dry_normal" selected>Сухой / нормальный</option>
+        <option value="wet_moist">Влажный / мокрый</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="s1_attic_type">Тип чердака</label>
+      <select id="s1_attic_type">
+  <option value="cold">Холодный (неотапливаемый)</option>
+  <option value="warm">Тёплый (в зоне tв)</option>
+  <option value="none">Нет чердака / совмещённое покрытие</option>
+</select>
+
+    </div>
+
+    <div class="control">
+      <label for="s1_subfloor_type">Тип техподполья</label>
+      <select id="s1_subfloor_type">
+        <option value="unheated">Неотапливаемое</option>
+        <option value="basement_warm">Подвал/цоколь “условно тёплый”</option>
+        <option value="heated">Отапливаемое (в зоне tв)</option>
+      </select>
+    </div>
+
+    <!-- Вентиляция / инфильтрация (для пв, ч⁻¹) — НОРМАТИВНО по СП РК 2.04-107-2022 (прил. Б) -->
+    <div class="control">
+      <label for="s1_people">Численность людей (m), чел</label>
+      <input id="s1_people" type="number" min="0" step="1" placeholder="например, 25">
+    </div>
+
+    <div class="control">
+      <label for="s1_hfloor">Высота этажа (hэт), м</label>
+      <input id="s1_hfloor" type="number" min="2" step="0.05" placeholder="например, 3.0">
+    </div>
+
+    <div class="control">
+      <label for="s1_beta_v">Коэф. уменьшения объема воздуха βν (если нет данных = 0.85)</label>
+      <input id="s1_beta_v" type="number" min="0.5" max="1" step="0.01" value="0.85">
+    </div>
+
+    <div class="control">
+      <label for="s1_vent_hpd">Режим вентиляции: часов/сутки (отоп. период)</label>
+      <input id="s1_vent_hpd" type="number" min="0" max="24" step="0.5" placeholder="например, 12">
+    </div>
+
+    <div class="control">
+      <label for="s1_vent_scheme">Схема вентиляции (для nинф по СП)</label>
+      <select id="s1_vent_scheme">
+        <option value="balanced" selected>Сбалансированная приточно-вытяжная (nинф = 168)</option>
+        <option value="overpressure">Приточная с избыточным давлением (nинф = 168 − nжелд)</option>
+      </select>
+    </div>
+
+    <div class="control" id="wrap_Lvent_proj" style="display:none">
+      <label for="s1_Lvent_proj">Lжелд по проекту ОВиК, м³/ч (для общественных/производственных)</label>
+      <input id="s1_Lvent_proj" type="number" min="0" step="1" placeholder="например, 1200">
+    </div>
+
+    <div class="control">
+      <label for="s1_wind_v">v — скорость ветра (январь, P≥16%), м/с (СП РК 2.04-01-2017)</label>
+      <input id="s1_wind_v" type="number" min="0" step="0.1" placeholder="например, 4.5">
+    </div>
+
+    <div class="control">
+      <label for="s1_Ri_ok">Rи,ок — сопротивление воздухопроницанию окон/балк. дверей</label>
+      <input id="s1_Ri_ok" type="number" min="0" step="0.01" placeholder="из паспорта/сертификата">
+    </div>
+
+    <div class="control">
+      <label for="s1_Ri_dv">Rи,дв — сопротивление воздухопроницанию входных дверей/ворот</label>
+      <input id="s1_Ri_dv" type="number" min="0" step="0.01" placeholder="из паспорта/сертификата">
+    </div>
+
+<div class="control right">
+      <label>Класс</label>
+      <div class="badge-wrap">
+        <span id="assignedClassBadge" class="badge">—</span>
+      </div>
+    </div>
+  </div>
+
+  <h1>Отчетная информация для зданий, строений, сооружений</h1>
+
+  <!-- 1. Расчетные условия -->
+  <h2>1. Расчетные условия</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№п/п</th>
+      <th style="width:54%">Наименование расчетных параметров</th>
+      <th style="width:12%">Обозначение параметра</th>
+      <th style="width:12%">Единица измерения</th>
+      <th style="width:16%">Расчетное значение</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Расчетная температура наружного воздуха для проектирования теплозащиты</td>
+      <td>tн</td>
+      <td>°C</td>
+      <td><input id="s1_tn" type="number" step="0.1" readonly></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Средняя температура наружного воздуха за отопительный период</td>
+      <td>tот</td>
+      <td>°C</td>
+      <td><input id="s1_tot" type="number" step="0.1" readonly></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Продолжительность отопительного периода</td>
+      <td>zот</td>
+      <td>сут/год</td>
+      <td><input id="s1_zot" type="number" step="1" readonly></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="left">Градусо-сутки отопительного периода</td>
+      <td>ГСОП</td>
+      <td>°C·сут/год</td>
+      <td><input id="s1_gsop" type="number" step="1" readonly></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="left">Расчетная температура внутреннего воздуха для проектирования теплозащиты</td>
+      <td>tв</td>
+      <td>°C</td>
+      <td><input id="s1_tv" type="number" step="0.1"></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td class="left">Расчетная температура чердака</td>
+      <td>tчерд</td>
+      <td>°C</td>
+      <td><input id="s1_tcherd" type="number" step="0.1" readonly></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">Расчетная температура техподполья</td>
+      <td>tподп</td>
+      <td>°C</td>
+      <td><input id="s1_tpodp" type="number" step="0.1" readonly></td>
+    </tr>
+  </table>
+
+  <!-- 2. Показатели геометрические -->
+  <h2>2. Показатели геометрические</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:40%">Показатель</th>
+      <th style="width:14%">Обозначение и единица измерения</th>
+      <th style="width:13%">Нормативное значение</th>
+      <th style="width:13%">Расчетное проектное значение</th>
+      <th style="width:14%">Фактическое значение</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td class="left">Сумма площадей этажей здания</td>
+      <td>Aот, м²</td>
+      <td><input id="s2_aot_norm"></td>
+      <td><input id="s2_aot_proj"></td>
+      <td><input id="s2_aot_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Площадь жилых помещений</td>
+      <td>Aж, м²</td>
+      <td><input id="s2_aj_norm"></td>
+      <td><input id="s2_aj_proj"></td>
+      <td><input id="s2_aj_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Расчетная площадь (общественных зданий)</td>
+      <td>Aр, м²</td>
+      <td><input id="s2_ar_norm"></td>
+      <td><input id="s2_ar_proj"></td>
+      <td><input id="s2_ar_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="left">Отапливаемый объем</td>
+      <td>Vот, м³</td>
+      <td><input id="s2_vot_norm"></td>
+      <td><input id="s2_vot_proj"></td>
+      <td><input id="s2_vot_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="left">Коэффициент остекленности фасада здания</td>
+      <td>f</td>
+      <td><input id="s2_f_norm"></td>
+      <td><input id="s2_f_proj"></td>
+      <td><input id="s2_f_fact" readonly></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td class="left">Показатель компактности здания</td>
+      <td>Kкомп</td>
+      <td><input id="s2_kkomp_norm"></td>
+      <td><input id="s2_kkomp_proj"></td>
+      <td><input id="s2_kkomp_fact" readonly></td>
+    </tr>
+
+    <tr>
+      <td>7</td>
+      <td class="left"><b>Общая площадь наружных ограждающих конструкций здания, в том числе:</b></td>
+      <td>Aнсум, м²</td>
+      <td><input id="s2_ansum_norm"></td>
+      <td><input id="s2_ansum_proj"></td>
+      <!-- авто-поле -->
+      <td><input id="s2_ansum_fact" readonly></td>
+    </tr>
+
+    <tr>
+      <td>7</td>
+      <td class="left">1) фасадов</td>
+      <td>Aфас</td>
+      <td><input id="s2_afas_norm"></td>
+      <td><input id="s2_afas_proj"></td>
+      <!-- авто-поле -->
+      <td><input id="s2_afas_fact" readonly></td>
+    </tr>
+    <tr>
+  <td colspan="6">
+    <div id="warn_afas" style="margin:6px 0; font-size:12px; color:#a35a00; display:none;"></div>
+  </td>
+</tr>
+
+    <tr>
+      <td>7</td>
+      <td class="left">2) стен (раздельно по типу конструкции)</td>
+      <td>Aст</td>
+      <td><input id="s2_ast_norm"></td>
+      <td><input id="s2_ast_proj"></td>
+      <td><input id="s2_ast_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">3) окон и балконных дверей</td>
+      <td>Aок.1</td>
+      <td><input id="s2_aok1_norm"></td>
+      <td><input id="s2_aok1_proj"></td>
+      <td><input id="s2_aok1_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">4) витражей</td>
+      <td>Aок.2</td>
+      <td><input id="s2_aok2_norm"></td>
+      <td><input id="s2_aok2_proj"></td>
+      <td><input id="s2_aok2_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">5) фонарей</td>
+      <td>Aок.3</td>
+      <td><input id="s2_aok3_norm"></td>
+      <td><input id="s2_aok3_proj"></td>
+      <td><input id="s2_aok3_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">6) окон лестнично-лифтовых узлов</td>
+      <td>Aок.4</td>
+      <td><input id="s2_aok4_norm"></td>
+      <td><input id="s2_aok4_proj"></td>
+      <td><input id="s2_aok4_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">7) балконных дверей наружных переходов</td>
+      <td>Aдв</td>
+      <td><input id="s2_adv7_norm"></td>
+      <td><input id="s2_adv7_proj"></td>
+      <td><input id="s2_adv7_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">8) входных дверей и ворот (раздельно)</td>
+      <td>Aдв</td>
+      <td><input id="s2_adv8_norm"></td>
+      <td><input id="s2_adv8_proj"></td>
+      <td><input id="s2_adv8_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">9) покрытий (совмещенных)</td>
+      <td>Aпокр</td>
+      <td><input id="s2_apokr_norm"></td>
+      <td><input id="s2_apokr_proj"></td>
+      <td><input id="s2_apokr_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">10) чердачных перекрытий</td>
+      <td>Aчерд</td>
+      <td><input id="s2_acherd_norm"></td>
+      <td><input id="s2_acherd_proj"></td>
+      <td><input id="s2_acherd_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">11) перекрытий "теплых" чердаков (эквивалентная)</td>
+      <td>Aчерд.т</td>
+      <td><input id="s2_acherdt_norm"></td>
+      <td><input id="s2_acherdt_proj"></td>
+      <td><input id="s2_acherdt_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">12) перекрытий над техническими подпольями или над неотапливаемыми подвалами (эквивалентная)</td>
+      <td>Aцок1</td>
+      <td><input id="s2_acok1_norm"></td>
+      <td><input id="s2_acok1_proj"></td>
+      <td><input id="s2_acok1_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">13) перекрытий над проездами или под эркерами</td>
+      <td>A цок2</td>
+      <td><input id="s2_acok2_norm"></td>
+      <td><input id="s2_acok2_proj"></td>
+      <td><input id="s2_acok2_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td class="left">14) стен в земле и пола по грунту (раздельно)</td>
+      <td>A цок3</td>
+      <td><input id="s2_acok3_norm"></td>
+      <td><input id="s2_acok3_proj"></td>
+      <td><input id="s2_acok3_fact" type="number" step="0.01"></td>
+    </tr>
+  </table>
+
+  <!-- 3. Показатели теплотехнические -->
+  <h2>3. Показатели теплотехнические</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:40%">Показатель</th>
+      <th style="width:14%">Обозначение и единица измерения</th>
+      <th style="width:13%">Нормативное значение</th>
+      <th style="width:13%">Расчетное, проектное значение</th>
+      <th style="width:14%">Фактическое значение</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td class="left"><b>Приведенное сопротивление теплопередаче наружных ограждений, в том числе:</b></td>
+      <td></td>
+      <td></td><td></td><td></td>
+    </tr>
+
+    <tr>
+      <td>1</td>
+      <td class="left">1) стен (раздельно по типу конструкции)</td>
+      <td>R₀ст, м²·°C/Вт</td>
+      <td><input id="s3_wall_norm"></td>
+      <td><input id="s3_wall_proj"></td>
+      <td><input id="s3_wall_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">2) окон и балконных дверей</td>
+      <td>R₀ок, м²·°C/Вт</td>
+      <td><input id="s3_win_norm"></td>
+      <td><input id="s3_win_proj"></td>
+      <td><input id="s3_win_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">3) витражей</td>
+      <td>R₀витр, м²·°C/Вт</td>
+      <td><input id="s3_vitr_norm"></td>
+      <td><input id="s3_vitr_proj"></td>
+      <td><input id="s3_vitr_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">4) фонарей</td>
+      <td>R₀фон, м²·°C/Вт</td>
+      <td><input id="s3_lantern_norm"></td>
+      <td><input id="s3_lantern_proj"></td>
+      <td><input id="s3_lantern_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">5) окон лестнично-лифтовых узлов</td>
+      <td>R₀л-л, м²·°C/Вт</td>
+      <td><input id="s3_stairwin_norm" readonly></td>
+      <td><input id="s3_stairwin_proj"></td>
+      <td><input id="s3_stairwin_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">6) балконных дверей наружных переходов</td>
+      <td>R₀бд, м²·°C/Вт</td>
+      <td><input id="s3_baldoor_norm" readonly></td>
+      <td><input id="s3_baldoor_proj"></td>
+      <td><input id="s3_baldoor_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">7) входных дверей и ворот (раздельно)</td>
+      <td>R₀дв/в, м²·°C/Вт</td>
+      <td><input id="s3_doorgate_norm" readonly></td>
+      <td><input id="s3_doorgate_proj"></td>
+      <td><input id="s3_doorgate_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">8) покрытий (совмещенных)</td>
+      <td>R₀покр, м²·°C/Вт</td>
+      <td><input id="s3_roof_norm"></td>
+      <td><input id="s3_roof_proj"></td>
+      <td><input id="s3_roof_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">9) чердачных перекрытий</td>
+      <td>R₀черд, м²·°C/Вт</td>
+      <td><input id="s3_attic_norm"></td>
+      <td><input id="s3_attic_proj"></td>
+      <td><input id="s3_attic_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">10) перекрытий "теплых" чердаков (эквивалентное)</td>
+      <td>R₀т.черд, м²·°C/Вт</td>
+      <td><input id="s3_warmattic_norm"></td>
+      <td><input id="s3_warmattic_proj"></td>
+      <td><input id="s3_warmattic_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">11) перекрытий над техническими подпольями или над неотапливаемыми подвалами (эквивалентное)</td>
+      <td>R₀подп, м²·°C/Вт</td>
+      <td><input id="s3_basement_norm"></td>
+      <td><input id="s3_basement_proj"></td>
+      <td><input id="s3_basement_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">12) перекрытий над проездами или под эркерами</td>
+      <td>R₀проезд, м²·°C/Вт</td>
+      <td><input id="s3_drive_norm"></td>
+      <td><input id="s3_drive_proj"></td>
+      <td><input id="s3_drive_fact" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">13) стен в земле и пола по грунту (раздельно)</td>
+      <td>R₀гр, м²·°C/Вт</td>
+      <td><input id="s3_ground_norm" readonly></td>
+      <td><input id="s3_ground_proj"></td>
+      <td><input id="s3_ground_fact" type="number" step="0.01"></td>
+    </tr>
+  </table>
+
+  <!-- Подсказка-гейт для таблицы 3 (JS пишет сюда причину) -->
+  <div class="note" id="s3_gate_hint">Таблица 3 будет активирована после заполнения ключевой геометрии в разделе 2.</div>
+  <!-- 4. Показатели вспомогательные -->
+  <h2>4. Показатели вспомогательные</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:54%">Показатель</th>
+      <th style="width:16%">Обозначение показателя и единицы измерения</th>
+      <th style="width:12%">Нормируемое значение</th>
+      <th style="width:12%">Расчетное, проектное значение</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Общий коэффициент теплопередачи здания</td>
+      <td>Kобщ, Вт/(м²·°C)</td>
+      <!-- ВАЖНО: id совпадают с теми, куда пишет JS -->
+      <td><input id="s4_kobsh_norm"></td>
+      <td><input id="s4_kobsh_proj"></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Средняя кратность воздухообмена здания за отопительный период при удельной норме воздухообмена</td>
+      <td>пв, ч⁻¹</td>
+      <td><input id="s4_pv_norm" readonly></td>
+      <td><input id="s4_pv_proj" readonly></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Удельные бытовые тепловыделения в здании</td>
+      <td>qбыт, Вт/м²</td>
+      <td><input id="s4_qbyt_norm"></td>
+      <td><input id="s4_qbyt_proj"></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="left">Тарифная цена тепловой энергии для проектируемого здания</td>
+      <td>Степл, тг./кВт·ч</td>
+      <td><input id="s4_stepl_norm"></td>
+      <td><input id="s4_stepl_proj"></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="left">Удельная цена отопительного оборудования и подключения к тепловой сети в районе строительства</td>
+      <td>Сот, тг./(кВт·ч/год)</td>
+      <td><input id="s4_sot_norm"></td>
+      <td><input id="s4_sot_proj"></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td class="left">Удельная прибыль от экономии энергетической единицы</td>
+      <td>Wпр, тг./(кВт·ч/год)</td>
+      <td><input id="s4_wpr_norm"></td>
+      <td><input id="s4_wpr_proj"></td>
+    </tr>
+  </table>
+
+  <!-- 5. Удельные характеристики -->
+  <h2>5. Удельные характеристики</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:54%">Показатель</th>
+      <th style="width:16%">Обозначение показателя и единицы измерения</th>
+      <th style="width:12%">Нормируемое значение</th>
+      <th style="width:12%">Расчетное, проектное значение</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Удельная теплозащитная характеристика здания</td>
+      <td>kоб, Вт/(м³·°C)</td>
+      <td><input id="s5_kob_norm"></td>
+      <td><input id="s5_kob_proj"></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Удельная вентиляционная характеристика здания</td>
+      <td>kвент, Вт/(м³·°C)</td>
+      <td><input id="s5_kvent_norm"></td>
+      <td><input id="s5_kvent_proj"></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Удельная характеристика бытовых тепловыделений здания</td>
+      <td>kбыт, Вт/(м³·°C)</td>
+      <td><input id="s5_kbyt_norm"></td>
+      <td><input id="s5_kbyt_proj"></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="left">Удельная характеристика теплопоступлений в здание от солнечной радиации</td>
+      <td>kрад, Вт/(м³·°C)</td>
+      <td><input id="s5_krad_norm"></td>
+      <td><input id="s5_krad_proj"></td>
+    </tr>
+  </table>
+
+  <!-- 6. Коэффициенты -->
+  <h2>6. Коэффициенты</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:64%">Показатель</th>
+      <th style="width:15%">Обозначение показателя и единицы измерения</th>
+      <th style="width:15%">Нормативное значение показателя</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Коэффициент эффективности авторегулирования отопления</td>
+      <td></td>
+      <td><input id="s6_k1"></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Коэффициент, учитывающий снижение теплопотребления жилых зданий при наличии поквартирного учета тепловой энергии на отопление</td>
+      <td></td>
+      <td><input id="s6_k2"></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Коэффициент эффективности рекуператора</td>
+      <td></td>
+      <td><input id="s6_k3"></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="left">Коэффициент, учитывающий снижение использования теплопоступлений в период превышения их над теплопотерями</td>
+      <td></td>
+      <td><input id="s6_k4"></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td class="left">Коэффициент учета дополнительных теплопотерь системы отопления</td>
+      <td></td>
+      <td><input id="s6_k5"></td>
+    </tr>
+  </table>
+
+  <!-- 7. Комплексные показатели энергоэффективности -->
+  <h2>7. Комплексные показатели энергоэффективности</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:64%">Показатель</th>
+      <th style="width:15%">Обозначение показателя и единицы измерения</th>
+      <th style="width:15%">Нормативное значение показателя</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Расчетная удельная характеристика расхода тепловой энергии на отопление и вентиляцию здания за отопительный период</td>
+      <td></td>
+      <td><input id="s7_qcalc" readonly></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Нормируемая удельная характеристика расхода тепловой энергии на отопление и вентиляцию здания за отопительный период</td>
+      <td></td>
+      <td><input id="s7_qnorm" readonly></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Класс энергетической эффективности</td>
+      <td></td>
+      <td><span id="s7_class">—</span></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td class="left">Соответствует ли проект здания нормативному требованию по теплозащите</td>
+      <td></td>
+      <td><span id="s7_compliance">—</span></td>
+    </tr>
+  </table>
+
+  <!-- 8. Показатель класса энергоэффективности здания -->
+  <h2>8. Показатель класса энергоэффективности здания</h2>
+  <table>
+    <tr>
+      <th colspan="2">Класс энергоэффективности здания</th>
+    </tr>
+    <tr>
+      <td class="left" style="width:40%">Обратившее лицо</td>
+      <td style="width:60%"><input id="s8_client"></td>
+    </tr>
+    <tr>
+      <td class="left">объект</td>
+      <td><input id="s8_object"></td>
+    </tr>
+    <tr>
+      <td class="left">адрес объекта</td>
+      <td><input id="s8_address"></td>
+    </tr>
+    <tr>
+      <td class="left">год постройки</td>
+      <td><input id="s8_year" type="number" min="1800" max="2100"></td>
+    </tr>
+    <tr>
+      <td class="left">тип, этажность</td>
+      <td><input id="s8_typefloors"></td>
+    </tr>
+    <tr>
+      <td class="left">общая площадь, м²</td>
+      <td><input id="s8_area_total" type="number" step="0.01"></td>
+    </tr>
+    <tr>
+      <td class="left">отапливаемая площадь, м²</td>
+      <td><input id="s8_area_heated" type="number" step="0.01"></td>
+    </tr>
+
+    <tr>
+      <td class="left"><b>классы энергоэффективности</b></td>
+      <td class="left">
+        присвоенный класс энергоэффективности:
+        <b><span id="assignedClass">—</span></b>
+      </td>
+    </tr>
+
+    <tr><td class="left">очень высокий A++</td><td></td></tr>
+    <tr><td class="left">A+</td><td></td></tr>
+    <tr><td class="left">A</td><td></td></tr>
+    <tr><td class="left">высокий B+</td><td></td></tr>
+    <tr><td class="left">B</td><td></td></tr>
+    <tr><td class="left">нормальный C+</td><td></td></tr>
+    <tr><td class="left">C</td><td></td></tr>
+    <tr><td class="left">C-</td><td></td></tr>
+    <tr><td class="left">пониженный D</td><td></td></tr>
+    <tr><td class="left">низкий E</td><td></td></tr>
+
+    <tr>
+      <td class="left">нормативное теплопотребление объекта, Гкал *</td>
+      <td><input id="qNormGcal" type="number" step="0.001" readonly></td>
+    </tr>
+    <tr>
+      <td class="left">фактическое теплопотребление объекта, Гкал</td>
+      <td><input id="qFactGcal" type="number" step="0.001"></td>
+    </tr>
+  </table>
+  <div class="note">
+    * нормативные требования по теплопотреблению установлены для данного типа здания, согласно СН РК 2.04-07-2022 «Тепловая защита зданий».
+  </div>
+
+  <!-- 9. Энергетические нагрузки здания -->
+  <h2>9. Энергетические нагрузки здания</h2>
+  <table>
+    <tr>
+      <th style="width:6%">№ п/п</th>
+      <th style="width:54%">Показатель</th>
+      <th style="width:12%">Обозначения</th>
+      <th style="width:14%">Единица измерения</th>
+      <th style="width:14%">Величина</th>
+    </tr>
+    <tr>
+      <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td class="left">Удельный расход тепловой энергии на отопление и вентиляцию здания за отопительный период</td>
+      <td></td>
+      <td>кВтч/(м³·год) кВтч/(м²·год)</td>
+      <td class="left">
+        кВтч/(м³·год): <b><span id="qSpecM3">—</span></b><br>
+        кВтч/(м²·год): <b><span id="qSpecM2">—</span></b>
+      </td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td class="left">Расход тепловой энергии на отопление и вентиляцию здания за отопительный период</td>
+      <td></td>
+      <td>кВтч/(год)</td>
+      <td><b><span id="qYearKwh">—</span></b></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td class="left">Общие теплопотери здания за отопительный период</td>
+      <td></td>
+      <td>кВтч/(год)</td>
+      <td><b><span id="qLossKwh">—</span></b></td>
+    </tr>
+  </table>
+
+  <!-- Охрана доступа / логика расчёта -->
+  <script type="module" src="guard.js"></script>
+  <script src="energy-passport-nonindustrial.js"></script>
+</body>
+</html>
