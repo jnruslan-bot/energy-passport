@@ -1,0 +1,2072 @@
+{
+  "Актобе": {
+    "cold_period": {
+      "abs_min": -48.5,
+      "t_coldest_day_0_94": -37.0,
+      "t_coldest_day_0_98": -32.9,
+      "t_coldest_5day_0_92": -34.2,
+      "t_coldest_5day_0_98": -29.9,
+      "t_outdoor_0_94": -18.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 149,
+        "t_avg": -8.4
+      },
+      "threshold_8C": {
+        "days": 199,
+        "t_avg": -6.2
+      },
+      "threshold_10C": {
+        "days": 210,
+        "t_avg": -4.2
+      },
+      "start": "04.10",
+      "end": "20.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -34.2,
+      "t_ot": -6.2,
+      "z_ot": 199
+    }
+  },
+  "Шалкар": {
+    "cold_period": {
+      "abs_min": -45.0,
+      "t_coldest_day_0_94": -36.1,
+      "t_coldest_day_0_98": -32.4,
+      "t_coldest_5day_0_92": -33.0,
+      "t_coldest_5day_0_98": -29.9,
+      "t_outdoor_0_94": -18.8,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 139,
+        "t_avg": -8.8
+      },
+      "threshold_8C": {
+        "days": 187,
+        "t_avg": -5.1
+      },
+      "threshold_10C": {
+        "days": 198,
+        "t_avg": -4.4
+      },
+      "start": "10.10",
+      "end": "14.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -33.0,
+      "t_ot": -5.1,
+      "z_ot": 187
+    }
+  },
+  "Балкаш": {
+    "cold_period": {
+      "abs_min": -39.7,
+      "t_coldest_day_0_94": -34.5,
+      "t_coldest_day_0_98": -31.0,
+      "t_coldest_5day_0_92": -32.6,
+      "t_coldest_5day_0_98": -27.5,
+      "t_outdoor_0_94": -17.6,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 135,
+        "t_avg": -8.9
+      },
+      "threshold_8C": {
+        "days": 187,
+        "t_avg": -4.8
+      },
+      "threshold_10C": {
+        "days": 200,
+        "t_avg": -4.1
+      },
+      "start": "11.10",
+      "end": "16.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -32.6,
+      "t_ot": -4.8,
+      "z_ot": 187
+    }
+  },
+  "Жезказган": {
+    "cold_period": {
+      "abs_min": -42.7,
+      "t_coldest_day_0_94": -34.8,
+      "t_coldest_day_0_98": -33.1,
+      "t_coldest_5day_0_92": -33.4,
+      "t_coldest_5day_0_98": -29.6,
+      "t_outdoor_0_94": -18.6,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 144,
+        "t_avg": -8.9
+      },
+      "threshold_8C": {
+        "days": 193,
+        "t_avg": -5.6
+      },
+      "threshold_10C": {
+        "days": 205,
+        "t_avg": -4.3
+      },
+      "start": "05.10",
+      "end": "16.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -33.4,
+      "t_ot": -5.6,
+      "z_ot": 193
+    }
+  },
+  "Караганда": {
+    "cold_period": {
+      "abs_min": -42.9,
+      "t_coldest_day_0_94": -37.6,
+      "t_coldest_day_0_98": -34.7,
+      "t_coldest_5day_0_92": -35.4,
+      "t_coldest_5day_0_98": -28.9,
+      "t_outdoor_0_94": -18.6,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 157,
+        "t_avg": -8.9
+      },
+      "threshold_8C": {
+        "days": 207,
+        "t_avg": -4.8
+      },
+      "threshold_10C": {
+        "days": 221,
+        "t_avg": -4.6
+      },
+      "start": "30.09",
+      "end": "25.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -35.4,
+      "t_ot": -4.8,
+      "z_ot": 207
+    }
+  },
+  "Акадыр": {
+    "cold_period": {
+      "abs_min": -45.8,
+      "t_coldest_day_0_94": -37.7,
+      "t_coldest_day_0_98": -34.6,
+      "t_coldest_5day_0_92": -35.4,
+      "t_coldest_5day_0_98": -30.6,
+      "t_outdoor_0_94": -20.6,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 156,
+        "t_avg": -9.8
+      },
+      "threshold_8C": {
+        "days": 206,
+        "t_avg": -6.9
+      },
+      "threshold_10C": {
+        "days": 220,
+        "t_avg": -5.2
+      },
+      "start": "30.09",
+      "end": "24.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -35.4,
+      "t_ot": -6.9,
+      "z_ot": 206
+    }
+  },
+  "Аягоз": {
+    "cold_period": {
+      "abs_min": -44.9,
+      "t_coldest_day_0_94": -37.6,
+      "t_coldest_day_0_98": -36.3,
+      "t_coldest_5day_0_92": -34.4,
+      "t_coldest_5day_0_98": -32.8,
+      "t_outdoor_0_94": -20.8,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 153,
+        "t_avg": -10.5
+      },
+      "threshold_8C": {
+        "days": 207,
+        "t_avg": -7.3
+      },
+      "threshold_10C": {
+        "days": 222,
+        "t_avg": -5.5
+      },
+      "start": "01.10",
+      "end": "25.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -34.4,
+      "t_ot": -7.3,
+      "z_ot": 207
+    }
+  },
+  "Зайсан": {
+    "cold_period": {
+      "abs_min": -40.9,
+      "t_coldest_day_0_94": -39.6,
+      "t_coldest_day_0_98": -37.0,
+      "t_coldest_5day_0_92": -38.6,
+      "t_coldest_5day_0_98": -35.2,
+      "t_outdoor_0_94": -19.9,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 145,
+        "t_avg": -10.8
+      },
+      "threshold_8C": {
+        "days": 188,
+        "t_avg": -6.7
+      },
+      "threshold_10C": {
+        "days": 200,
+        "t_avg": -6.2
+      },
+      "start": "11.10",
+      "end": "17.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -38.6,
+      "t_ot": -6.7,
+      "z_ot": 188
+    }
+  },
+  "Катон-Карагай": {
+    "cold_period": {
+      "abs_min": -44.4,
+      "t_coldest_day_0_94": -36.1,
+      "t_coldest_day_0_98": -34.9,
+      "t_coldest_5day_0_92": -32.9,
+      "t_coldest_5day_0_98": -29.9,
+      "t_outdoor_0_94": -17.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 165,
+        "t_avg": -8.6
+      },
+      "threshold_8C": {
+        "days": 226,
+        "t_avg": -3.3
+      },
+      "threshold_10C": {
+        "days": 244,
+        "t_avg": -3.9
+      },
+      "start": "23.09",
+      "end": "07.05",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -32.9,
+      "t_ot": -3.3,
+      "z_ot": 226
+    }
+  },
+  "Семипалатинск": {
+    "cold_period": {
+      "abs_min": -46.8,
+      "t_coldest_day_0_94": -41.9,
+      "t_coldest_day_0_98": -38.8,
+      "t_coldest_5day_0_92": -39.4,
+      "t_coldest_5day_0_98": -35.7,
+      "t_outdoor_0_94": -20.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 148,
+        "t_avg": -9.9
+      },
+      "threshold_8C": {
+        "days": 200,
+        "t_avg": -6.9
+      },
+      "threshold_10C": {
+        "days": 214,
+        "t_avg": -5.0
+      },
+      "start": "04.10",
+      "end": "22.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -39.4,
+      "t_ot": -6.9,
+      "z_ot": 200
+    }
+  },
+  "Усть-Каменогорск": {
+    "cold_period": {
+      "abs_min": -48.9,
+      "t_coldest_day_0_94": -43.7,
+      "t_coldest_day_0_98": -40.2,
+      "t_coldest_5day_0_92": -40.7,
+      "t_coldest_5day_0_98": -37.3,
+      "t_outdoor_0_94": -22.9,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 147,
+        "t_avg": -10.9
+      },
+      "threshold_8C": {
+        "days": 202,
+        "t_avg": -7.2
+      },
+      "threshold_10C": {
+        "days": 216,
+        "t_avg": -5.8
+      },
+      "start": "04.10",
+      "end": "24.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -40.7,
+      "t_ot": -7.2,
+      "z_ot": 202
+    }
+  },
+  "Шемонаиха": {
+    "cold_period": {
+      "abs_min": -48.0,
+      "t_coldest_day_0_94": -44.6,
+      "t_coldest_day_0_98": -41.9,
+      "t_coldest_5day_0_92": -41.9,
+      "t_coldest_5day_0_98": -37.3,
+      "t_outdoor_0_94": -21.7,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 155,
+        "t_avg": -10.2
+      },
+      "threshold_8C": {
+        "days": 208,
+        "t_avg": -7.8
+      },
+      "threshold_10C": {
+        "days": 221,
+        "t_avg": -5.4
+      },
+      "start": "02.10",
+      "end": "27.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -41.9,
+      "t_ot": -7.8,
+      "z_ot": 208
+    }
+  },
+  "Кызылорда": {
+    "cold_period": {
+      "abs_min": -37.2,
+      "t_coldest_day_0_94": -29.4,
+      "t_coldest_day_0_98": -27.1,
+      "t_coldest_5day_0_92": -27.88,
+      "t_coldest_5day_0_98": -23.44,
+      "t_outdoor_0_94": -11.7,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 109,
+        "t_avg": -5.0
+      },
+      "threshold_8C": {
+        "days": 164,
+        "t_avg": -0.9
+      },
+      "threshold_10C": {
+        "days": 178,
+        "t_avg": -1.0
+      },
+      "start": "20.10",
+      "end": "02.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -27.88,
+      "t_ot": -0.9,
+      "z_ot": 164
+    }
+  },
+  "Аральск": {
+    "cold_period": {
+      "abs_min": -37.9,
+      "t_coldest_day_0_94": -34.9,
+      "t_coldest_day_0_98": -29.2,
+      "t_coldest_5day_0_92": -32.48,
+      "t_coldest_5day_0_98": -26.3,
+      "t_outdoor_0_94": -18.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 127,
+        "t_avg": -7.4
+      },
+      "threshold_8C": {
+        "days": 177,
+        "t_avg": -3.4
+      },
+      "threshold_10C": {
+        "days": 190,
+        "t_avg": -3.2
+      },
+      "start": "16.10",
+      "end": "11.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -32.48,
+      "t_ot": -3.4,
+      "z_ot": 177
+    }
+  },
+  "Туркестан": {
+    "cold_period": {
+      "abs_min": -38.6,
+      "t_coldest_day_0_94": -32.6,
+      "t_coldest_day_0_98": -24.6,
+      "t_coldest_5day_0_92": -26.0,
+      "t_coldest_5day_0_98": -20.6,
+      "t_outdoor_0_94": -6.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 79,
+        "t_avg": -2.1
+      },
+      "threshold_8C": {
+        "days": 148,
+        "t_avg": 1.0
+      },
+      "threshold_10C": {
+        "days": 163,
+        "t_avg": 1.9
+      },
+      "start": "28.10",
+      "end": "24.03",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -26.0,
+      "t_ot": 1.0,
+      "z_ot": 148
+    }
+  },
+  "Шымкент": {
+    "cold_period": {
+      "abs_min": -30.3,
+      "t_coldest_day_0_94": -25.2,
+      "t_coldest_day_0_98": -16.9,
+      "t_coldest_5day_0_92": -17.76,
+      "t_coldest_5day_0_98": -14.3,
+      "t_outdoor_0_94": -4.5,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 48,
+        "t_avg": -0.4
+      },
+      "threshold_8C": {
+        "days": 136,
+        "t_avg": 2.1
+      },
+      "threshold_10C": {
+        "days": 155,
+        "t_avg": 3.1
+      },
+      "start": "06.11",
+      "end": "22.03",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -17.76,
+      "t_ot": 2.1,
+      "z_ot": 136
+    }
+  },
+  "Тараз": {
+    "cold_period": {
+      "abs_min": -41.0,
+      "t_coldest_day_0_94": -32.6,
+      "t_coldest_day_0_98": -26.1,
+      "t_coldest_5day_0_92": -27.4,
+      "t_coldest_5day_0_98": -21.1,
+      "t_outdoor_0_94": -7.8,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 88,
+        "t_avg": -2.3
+      },
+      "threshold_8C": {
+        "days": 160,
+        "t_avg": 1.7
+      },
+      "threshold_10C": {
+        "days": 178,
+        "t_avg": 1.6
+      },
+      "start": "23.10",
+      "end": "01.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -27.4,
+      "t_ot": 1.7,
+      "z_ot": 160
+    }
+  },
+  "Кордай": {
+    "cold_period": {
+      "abs_min": -37.8,
+      "t_coldest_day_0_94": -26.2,
+      "t_coldest_day_0_98": -24.0,
+      "t_coldest_5day_0_92": -22.5,
+      "t_coldest_5day_0_98": -19.5,
+      "t_outdoor_0_94": -9.3,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 112,
+        "t_avg": -3.5
+      },
+      "threshold_8C": {
+        "days": 181,
+        "t_avg": 0.0
+      },
+      "threshold_10C": {
+        "days": 199,
+        "t_avg": 0.4
+      },
+      "start": "16.10",
+      "end": "15.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -22.5,
+      "t_ot": 0.0,
+      "z_ot": 181
+    }
+  },
+  "Шыганак": {
+    "cold_period": {
+      "abs_min": -40.5,
+      "t_coldest_day_0_94": -33.5,
+      "t_coldest_day_0_98": -29.1,
+      "t_coldest_5day_0_92": -31.3,
+      "t_coldest_5day_0_98": -27.2,
+      "t_outdoor_0_94": -15.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 120,
+        "t_avg": -7.3
+      },
+      "threshold_8C": {
+        "days": 175,
+        "t_avg": -2.7
+      },
+      "threshold_10C": {
+        "days": 187,
+        "t_avg": -2.8
+      },
+      "start": "16.10",
+      "end": "09.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -31.3,
+      "t_ot": -2.7,
+      "z_ot": 175
+    }
+  },
+  "Алматы": {
+    "cold_period": {
+      "abs_min": -37.7,
+      "t_coldest_day_0_94": -26.9,
+      "t_coldest_day_0_98": -23.4,
+      "t_coldest_5day_0_92": -23.3,
+      "t_coldest_5day_0_98": -20.1,
+      "t_outdoor_0_94": -8.1,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 105,
+        "t_avg": -2.9
+      },
+      "threshold_8C": {
+        "days": 164,
+        "t_avg": 0.4
+      },
+      "threshold_10C": {
+        "days": 179,
+        "t_avg": 0.8
+      },
+      "start": "22.10",
+      "end": "03.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -23.3,
+      "t_ot": 0.4,
+      "z_ot": 164
+    }
+  },
+  "Жаркент": {
+    "cold_period": {
+      "abs_min": -42.3,
+      "t_coldest_day_0_94": -24.7,
+      "t_coldest_day_0_98": -22.0,
+      "t_coldest_5day_0_92": -23.6,
+      "t_coldest_5day_0_98": -18.6,
+      "t_outdoor_0_94": -9.3,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 101,
+        "t_avg": -4.3
+      },
+      "threshold_8C": {
+        "days": 158,
+        "t_avg": -1.4
+      },
+      "threshold_10C": {
+        "days": 172,
+        "t_avg": 0.1
+      },
+      "start": "22.10",
+      "end": "30.03",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -23.6,
+      "t_ot": -1.4,
+      "z_ot": 158
+    }
+  },
+  "Талдыкорган": {
+    "cold_period": {
+      "abs_min": -42.0,
+      "t_coldest_day_0_94": -31.6,
+      "t_coldest_day_0_98": -28.8,
+      "t_coldest_5day_0_92": -29.3,
+      "t_coldest_5day_0_98": -25.3,
+      "t_outdoor_0_94": -12.5,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 116,
+        "t_avg": -5.3
+      },
+      "threshold_8C": {
+        "days": 172,
+        "t_avg": -1.5
+      },
+      "threshold_10C": {
+        "days": 187,
+        "t_avg": -1.1
+      },
+      "start": "17.10",
+      "end": "07.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -29.3,
+      "t_ot": -1.5,
+      "z_ot": 172
+    }
+  },
+  "Баканас": {
+    "cold_period": {
+      "abs_min": -45.0,
+      "t_coldest_day_0_94": -31.9,
+      "t_coldest_day_0_98": -28.7,
+      "t_coldest_5day_0_92": -29.6,
+      "t_coldest_5day_0_98": -26.7,
+      "t_outdoor_0_94": -14.1,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 116,
+        "t_avg": -6.2
+      },
+      "threshold_8C": {
+        "days": 170,
+        "t_avg": -2.1
+      },
+      "threshold_10C": {
+        "days": 183,
+        "t_avg": -1.8
+      },
+      "start": "17.10",
+      "end": "05.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -29.6,
+      "t_ot": -2.1,
+      "z_ot": 170
+    }
+  },
+  "Петропавловск": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 163,
+        "t_avg": -10.9
+      },
+      "threshold_8C": {
+        "days": 218,
+        "t_avg": -5.0
+      },
+      "threshold_10C": {
+        "days": 232,
+        "t_avg": -5.9
+      },
+      "start": "25.09",
+      "end": "01.05",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -38.4,
+      "t_ot": -5.0,
+      "z_ot": 218
+    },
+    "cold_period": {
+      "abs_min": -45.0,
+      "t_coldest_day_0_94": -41.3,
+      "t_coldest_day_0_98": -39.3,
+      "t_coldest_5day_0_92": -38.4,
+      "t_coldest_5day_0_98": -34.8,
+      "t_outdoor_0_94": -21.5,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Сергеевка": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 161,
+        "t_avg": -11.2
+      },
+      "threshold_8C": {
+        "days": 210,
+        "t_avg": -6.2
+      },
+      "threshold_10C": {
+        "days": 224,
+        "t_avg": -6.6
+      },
+      "start": "29.09",
+      "end": "27.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -39.3,
+      "t_ot": -6.2,
+      "z_ot": 210
+    },
+    "cold_period": {
+      "abs_min": -44.7,
+      "t_coldest_day_0_94": -40.9,
+      "t_coldest_day_0_98": -39.7,
+      "t_coldest_5day_0_92": -39.3,
+      "t_coldest_5day_0_98": -35.7,
+      "t_outdoor_0_94": -22.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Костанай": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 158,
+        "t_avg": -10.0
+      },
+      "threshold_8C": {
+        "days": 204,
+        "t_avg": -7.1
+      },
+      "threshold_10C": {
+        "days": 218,
+        "t_avg": -5.6
+      },
+      "start": "01.10",
+      "end": "23.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -38.2,
+      "t_ot": -7.1,
+      "z_ot": 204
+    },
+    "cold_period": {
+      "abs_min": -43.1,
+      "t_coldest_day_0_94": -39.9,
+      "t_coldest_day_0_98": -37.6,
+      "t_coldest_5day_0_92": -38.2,
+      "t_coldest_5day_0_98": -33.5,
+      "t_outdoor_0_94": -20.5,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Аркалык": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 159,
+        "t_avg": -9.9
+      },
+      "threshold_8C": {
+        "days": 205,
+        "t_avg": -7.0
+      },
+      "threshold_10C": {
+        "days": 216,
+        "t_avg": -5.7
+      },
+      "start": "01.10",
+      "end": "24.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -38.2,
+      "t_ot": -7.0,
+      "z_ot": 205
+    },
+    "cold_period": {
+      "abs_min": -43.2,
+      "t_coldest_day_0_94": -40.3,
+      "t_coldest_day_0_98": -36.3,
+      "t_coldest_5day_0_92": -38.2,
+      "t_coldest_5day_0_98": -31.2,
+      "t_outdoor_0_94": -20.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Торгай": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 149,
+        "t_avg": -9.6
+      },
+      "threshold_8C": {
+        "days": 192,
+        "t_avg": -6.8
+      },
+      "threshold_10C": {
+        "days": 203,
+        "t_avg": -5.4
+      },
+      "start": "07.10",
+      "end": "17.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -36.4,
+      "t_ot": -6.8,
+      "z_ot": 192
+    },
+    "cold_period": {
+      "abs_min": -40.5,
+      "t_coldest_day_0_94": -38.9,
+      "t_coldest_day_0_98": -34.3,
+      "t_coldest_5day_0_92": -36.4,
+      "t_coldest_5day_0_98": -31.2,
+      "t_outdoor_0_94": -20.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Астана": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 161,
+        "t_avg": -10.0
+      },
+      "threshold_8C": {
+        "days": 209,
+        "t_avg": -6.3
+      },
+      "threshold_10C": {
+        "days": 221,
+        "t_avg": -5.5
+      },
+      "start": "29.09",
+      "end": "26.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -37.7,
+      "t_ot": -6.3,
+      "z_ot": 209
+    },
+    "cold_period": {
+      "abs_min": -51.6,
+      "t_coldest_day_0_94": -40.2,
+      "t_coldest_day_0_98": -35.8,
+      "t_coldest_5day_0_92": -37.7,
+      "t_coldest_5day_0_98": -31.2,
+      "t_outdoor_0_94": -20.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Кокшетау": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 158,
+        "t_avg": -9.8
+      },
+      "threshold_8C": {
+        "days": 214,
+        "t_avg": -6.0
+      },
+      "threshold_10C": {
+        "days": 228,
+        "t_avg": -5.1
+      },
+      "start": "28.09",
+      "end": "30.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -38.0,
+      "t_ot": -6.0,
+      "z_ot": 214
+    },
+    "cold_period": {
+      "abs_min": -44.8,
+      "t_coldest_day_0_94": -42.0,
+      "t_coldest_day_0_98": -39.1,
+      "t_coldest_5day_0_92": -38.0,
+      "t_coldest_5day_0_98": -33.7,
+      "t_outdoor_0_94": -19.9,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Ерейментау": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 161,
+        "t_avg": -10.0
+      },
+      "threshold_8C": {
+        "days": 211,
+        "t_avg": -5.4
+      },
+      "threshold_10C": {
+        "days": 225,
+        "t_avg": -5.6
+      },
+      "start": "29.09",
+      "end": "28.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -37.9,
+      "t_ot": -5.4,
+      "z_ot": 211
+    },
+    "cold_period": {
+      "abs_min": -44.3,
+      "t_coldest_day_0_94": -40.8,
+      "t_coldest_day_0_98": -36.3,
+      "t_coldest_5day_0_92": -37.9,
+      "t_coldest_5day_0_98": -31.9,
+      "t_outdoor_0_94": -20.1,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Степногорск": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 160,
+        "t_avg": -10.7
+      },
+      "threshold_8C": {
+        "days": 211,
+        "t_avg": -7.5
+      },
+      "threshold_10C": {
+        "days": 225,
+        "t_avg": -6.0
+      },
+      "start": "30.09",
+      "end": "29.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -35.4,
+      "t_ot": -7.5,
+      "z_ot": 211
+    },
+    "cold_period": {
+      "abs_min": -44.4,
+      "t_coldest_day_0_94": -41.2,
+      "t_coldest_day_0_98": -36.6,
+      "t_coldest_5day_0_92": -35.4,
+      "t_coldest_5day_0_98": -32.2,
+      "t_outdoor_0_94": -20.9,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Павлодар": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 153,
+        "t_avg": -11.0
+      },
+      "threshold_8C": {
+        "days": 205,
+        "t_avg": -8.1
+      },
+      "threshold_10C": {
+        "days": 220,
+        "t_avg": -6.0
+      },
+      "start": "02.10",
+      "end": "25.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -39.6,
+      "t_ot": -8.1,
+      "z_ot": 205
+    },
+    "cold_period": {
+      "abs_min": -45.5,
+      "t_coldest_day_0_94": -42.2,
+      "t_coldest_day_0_98": -40.1,
+      "t_coldest_5day_0_92": -39.6,
+      "t_coldest_5day_0_98": -34.6,
+      "t_outdoor_0_94": -22.0,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Экибастуз": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 153,
+        "t_avg": -9.7
+      },
+      "threshold_8C": {
+        "days": 205,
+        "t_avg": -6.8
+      },
+      "threshold_10C": {
+        "days": 218,
+        "t_avg": -5.1
+      },
+      "start": "02.10",
+      "end": "25.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -36.6,
+      "t_ot": -6.8,
+      "z_ot": 205
+    },
+    "cold_period": {
+      "abs_min": -43.1,
+      "t_coldest_day_0_94": -39.3,
+      "t_coldest_day_0_98": -38.3,
+      "t_coldest_5day_0_92": -36.6,
+      "t_coldest_5day_0_98": -32.8,
+      "t_outdoor_0_94": -20.0,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Баянауыл": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 156,
+        "t_avg": -8.6
+      },
+      "threshold_8C": {
+        "days": 206,
+        "t_avg": -5.9
+      },
+      "threshold_10C": {
+        "days": 220,
+        "t_avg": -4.4
+      },
+      "start": "02.10",
+      "end": "26.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -35.6,
+      "t_ot": -5.9,
+      "z_ot": 206
+    },
+    "cold_period": {
+      "abs_min": -45.1,
+      "t_coldest_day_0_94": -38.8,
+      "t_coldest_day_0_98": -35.4,
+      "t_coldest_5day_0_92": -35.6,
+      "t_coldest_5day_0_98": -31.0,
+      "t_outdoor_0_94": -17.9,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Уральск": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 139,
+        "t_avg": -7.6
+      },
+      "threshold_8C": {
+        "days": 193,
+        "t_avg": -4.6
+      },
+      "threshold_10C": {
+        "days": 206,
+        "t_avg": -3.5
+      },
+      "start": "09.10",
+      "end": "20.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -33.4,
+      "t_ot": -4.6,
+      "z_ot": 193
+    },
+    "cold_period": {
+      "abs_min": -43.0,
+      "t_coldest_day_0_94": -37.1,
+      "t_coldest_day_0_98": -32.2,
+      "t_coldest_5day_0_92": -33.4,
+      "t_coldest_5day_0_98": -29.6,
+      "t_outdoor_0_94": -16.8,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Аксай": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 146,
+        "t_avg": -7.7
+      },
+      "threshold_8C": {
+        "days": 196,
+        "t_avg": -5.0
+      },
+      "threshold_10C": {
+        "days": 209,
+        "t_avg": -3.7
+      },
+      "start": "05.10",
+      "end": "19.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -34.1,
+      "t_ot": -5.0,
+      "z_ot": 196
+    },
+    "cold_period": {
+      "abs_min": -43.6,
+      "t_coldest_day_0_94": -36.2,
+      "t_coldest_day_0_98": -33.4,
+      "t_coldest_5day_0_92": -34.1,
+      "t_coldest_5day_0_98": -30.5,
+      "t_outdoor_0_94": -17.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Атырау": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 114,
+        "t_avg": -4.7
+      },
+      "threshold_8C": {
+        "days": 172,
+        "t_avg": -1.5
+      },
+      "threshold_10C": {
+        "days": 185,
+        "t_avg": -0.9
+      },
+      "start": "18.10",
+      "end": "08.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -27.3,
+      "t_ot": -1.5,
+      "z_ot": 172
+    },
+    "cold_period": {
+      "abs_min": -37.9,
+      "t_coldest_day_0_94": -30.7,
+      "t_coldest_day_0_98": -29.0,
+      "t_coldest_5day_0_92": -27.3,
+      "t_coldest_5day_0_98": -24.9,
+      "t_outdoor_0_94": -11.3,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Кульсары": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 117,
+        "t_avg": -5.8
+      },
+      "threshold_8C": {
+        "days": 170,
+        "t_avg": -1.4
+      },
+      "threshold_10C": {
+        "days": 182,
+        "t_avg": -2.0
+      },
+      "start": "18.10",
+      "end": "05.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -28.3,
+      "t_ot": -1.4,
+      "z_ot": 170
+    },
+    "cold_period": {
+      "abs_min": -36.2,
+      "t_coldest_day_0_94": -31.7,
+      "t_coldest_day_0_98": -28.9,
+      "t_coldest_5day_0_92": -28.3,
+      "t_coldest_5day_0_98": -26.6,
+      "t_outdoor_0_94": -13.2,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Актау": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 54,
+        "t_avg": -0.1
+      },
+      "threshold_8C": {
+        "days": 145,
+        "t_avg": 1.9
+      },
+      "threshold_10C": {
+        "days": 164,
+        "t_avg": 3.1
+      },
+      "start": "07.11",
+      "end": "31.03",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -19.7,
+      "t_ot": 1.9,
+      "z_ot": 145
+    },
+    "cold_period": {
+      "abs_min": -27.7,
+      "t_coldest_day_0_94": -22.6,
+      "t_coldest_day_0_98": -19.3,
+      "t_coldest_5day_0_92": -19.7,
+      "t_coldest_5day_0_98": -14.9,
+      "t_outdoor_0_94": -3.5,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Форт-Шевченко": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 60,
+        "t_avg": 0.2
+      },
+      "threshold_8C": {
+        "days": 146,
+        "t_avg": 2.5
+      },
+      "threshold_10C": {
+        "days": 163,
+        "t_avg": 2.8
+      },
+      "start": "07.11",
+      "end": "02.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -19.0,
+      "t_ot": 2.5,
+      "z_ot": 146
+    },
+    "cold_period": {
+      "abs_min": -25.0,
+      "t_coldest_day_0_94": -22.2,
+      "t_coldest_day_0_98": -19.8,
+      "t_coldest_5day_0_92": -19.0,
+      "t_coldest_5day_0_98": -15.08,
+      "t_outdoor_0_94": -3.5,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Бейнеу": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 110,
+        "t_avg": -4.4
+      },
+      "threshold_8C": {
+        "days": 165,
+        "t_avg": -0.3
+      },
+      "threshold_10C": {
+        "days": 179,
+        "t_avg": -0.7
+      },
+      "start": "21.10",
+      "end": "05.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -25.3,
+      "t_ot": -0.3,
+      "z_ot": 165
+    },
+    "cold_period": {
+      "abs_min": -34.7,
+      "t_coldest_day_0_94": -29.8,
+      "t_coldest_day_0_98": -28.0,
+      "t_coldest_5day_0_92": -25.3,
+      "t_coldest_5day_0_98": -23.95,
+      "t_outdoor_0_94": -10.8,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Балхаш": {
+    "cold_period": {
+      "abs_min": -39.7,
+      "t_coldest_day_0_94": -34.5,
+      "t_coldest_day_0_98": -31.0,
+      "t_coldest_5day_0_92": -32.6,
+      "t_coldest_5day_0_98": -27.5,
+      "t_outdoor_0_94": -17.6,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 135,
+        "t_avg": -8.9
+      },
+      "threshold_8C": {
+        "days": 187,
+        "t_avg": -4.8
+      },
+      "threshold_10C": {
+        "days": 200,
+        "t_avg": -4.1
+      },
+      "start": "11.10",
+      "end": "16.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -32.6,
+      "t_ot": -4.8,
+      "z_ot": 187
+    }
+  },
+  "Семей": {
+    "cold_period": {
+      "abs_min": -46.8,
+      "t_coldest_day_0_94": -41.9,
+      "t_coldest_day_0_98": -38.8,
+      "t_coldest_5day_0_92": -39.4,
+      "t_coldest_5day_0_98": -35.7,
+      "t_outdoor_0_94": -20.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    },
+    "heating_period": {
+      "threshold_0C": {
+        "days": 148,
+        "t_avg": -9.9
+      },
+      "threshold_8C": {
+        "days": 200,
+        "t_avg": -6.9
+      },
+      "threshold_10C": {
+        "days": 214,
+        "t_avg": -5.0
+      },
+      "start": "04.10",
+      "end": "22.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          60
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -39.4,
+      "t_ot": -6.9,
+      "z_ot": 200
+    }
+  },
+  "Нур-Султан": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 161,
+        "t_avg": -10.0
+      },
+      "threshold_8C": {
+        "days": 209,
+        "t_avg": -6.3
+      },
+      "threshold_10C": {
+        "days": 221,
+        "t_avg": -5.5
+      },
+      "start": "29.09",
+      "end": "26.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -37.7,
+      "t_ot": -6.3,
+      "z_ot": 209
+    },
+    "cold_period": {
+      "abs_min": -51.6,
+      "t_coldest_day_0_94": -40.2,
+      "t_coldest_day_0_98": -35.8,
+      "t_coldest_5day_0_92": -37.7,
+      "t_coldest_5day_0_98": -31.2,
+      "t_outdoor_0_94": -20.4,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  },
+  "Орал": {
+    "heating_period": {
+      "threshold_0C": {
+        "days": 139,
+        "t_avg": -7.6
+      },
+      "threshold_8C": {
+        "days": 193,
+        "t_avg": -4.6
+      },
+      "threshold_10C": {
+        "days": 206,
+        "t_avg": -3.5
+      },
+      "start": "09.10",
+      "end": "20.04",
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          59
+        ]
+      }
+    },
+    "derived": {
+      "t_n": -33.4,
+      "t_ot": -4.6,
+      "z_ot": 193
+    },
+    "cold_period": {
+      "abs_min": -43.0,
+      "t_coldest_day_0_94": -37.1,
+      "t_coldest_day_0_98": -32.2,
+      "t_coldest_5day_0_92": -33.4,
+      "t_coldest_5day_0_98": -29.6,
+      "t_outdoor_0_94": -16.8,
+      "_source": {
+        "doc": "СП РК 2.04-01-2017",
+        "table": "3.1",
+        "pages": [
+          58
+        ]
+      }
+    }
+  }
+}
