@@ -197,10 +197,13 @@
       <input id="s1_hfloor" type="number" min="2" step="0.05" placeholder="например, 3.0">
     </div>
 
-    <div class="control">
-      <label for="s1_beta_v">Коэф. уменьшения объема воздуха βν (если нет данных = 0.85)</label>
-      <input id="s1_beta_v" type="number" min="0.5" max="1" step="0.01" value="0.85">
-    </div>
+<div class="control">
+  <label for="s1_beta_v">
+    Коэф. уменьшения объема воздуха βν
+  </label>
+  <input id="s1_beta_v" type="number" min="0.5" max="1" step="0.01" value="0.85" readonly>
+  <div class="muted">По умолчанию 0,85 при отсутствии специальных данных.</div>
+</div>
 
     <div class="control">
       <label for="s1_vent_hpd">Режим вентиляции: часов/сутки (отоп. период)</label>

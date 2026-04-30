@@ -1809,11 +1809,14 @@ function pickTable9RowKey() {
     const rhoOut = calcGamma(tOutUse); // кг/м³
     if (!Number.isFinite(rhoOut) || rhoOut <= 0) return NaN;
 
-    const Linf = Ginf / rhoOut; // м³/ч
+const Linf = Ginf / rhoOut; // м³/ч
 
-    // p_v = (Lvent*nVent + Linf*nInf)/(Vot*168)
-    const pv = (Lvent * nVent + Linf * nInf) / (Vot * 168);
-    return Number.isFinite(pv) ? pv : NaN;
+const betaV = num("s1_beta_v");
+const betaUse = Number.isFinite(betaV) && betaV > 0 ? betaV : 0.85;
+
+// p_v = (Lvent*nVent + Linf*nInf)/(βν * Vot * 168)
+const pv = (Lvent * nVent + Linf * nInf) / (betaUse * Vot * 168);
+return Number.isFinite(pv) ? pv : NaN;
   }
 
   // pв,норм: используем СТРОГО Lжелд без fallback на проект (для нежилых)
@@ -2032,9 +2035,14 @@ window.addEventListener("load", hardDisableTable4Norm);
     const hpdEl = $("s1_vent_hpd");
     if (hpdEl && String(hpdEl.value ?? "").trim() === "") hpdEl.value = "24";
 
-    const hfloorEl = $("s1_hfloor");
-    if (hfloorEl && String(hfloorEl.value ?? "").trim() === "") hfloorEl.value = "3.0";
+const hfloorEl = $("s1_hfloor");
+if (hfloorEl && String(hfloorEl.value ?? "").trim() === "") hfloorEl.value = "3.0";
 
+const betaVEl = $("s1_beta_v");
+if (betaVEl) {
+  betaVEl.value = "0.85";
+  lockField("s1_beta_v");
+}
     // 4) Лочим поля климата/вычисляемые (tв НЕ лочим!)
     ["s1_tn", "s1_tot", "s1_zot", "s1_gsop", "s1_tcherd", "s1_tpodp"].forEach(lockField);
 
