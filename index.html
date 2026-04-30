@@ -11,13 +11,28 @@
 <h2>Вход / Регистрация</h2>
 
 <input id="email" placeholder="Email"><br>
-<input id="password" type="password" placeholder="Пароль"><br><br>
+
+<input id="password" type="password" placeholder="Пароль">
+<label style="font-size: 12px; margin-left: 6px;">
+  <input type="checkbox" id="showPassword">
+  Показать пароль
+</label>
+<br><br>
 
 <button onclick="login()">Войти</button>
 <button onclick="register()">Зарегистрироваться</button>
 
 <p id="msg"></p>
+<script>
+  const passwordInput = document.getElementById("password");
+  const showPasswordCheckbox = document.getElementById("showPassword");
 
+  if (passwordInput && showPasswordCheckbox) {
+    showPasswordCheckbox.addEventListener("change", () => {
+      passwordInput.type = showPasswordCheckbox.checked ? "text" : "password";
+    });
+  }
+</script>
 <script type="module" src="auth.js"></script>
 </body>
 </html>
