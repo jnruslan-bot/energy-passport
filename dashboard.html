@@ -3,20 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Рабочая зона</title>
-    <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
-  <link rel="apple-touch-icon" href="assets/favicon.jpg">
   <style>
     .actions{
       display:flex;
       gap:10px;
       align-items:center;
       flex-wrap:wrap;
-      margin:8px 0;
-      
+      margin: 8px 0;
     }
   </style>
 </head>
+
 <body>
+  <!-- dashboard version: measures-2026-04-30 -->
 
   <h1>Рабочая зона</h1>
   <p>Пользователь авторизован</p>
@@ -24,6 +23,8 @@
   <div class="actions">
     <button onclick="goToEnergyPassport()">Энергопаспорт</button>
     <button onclick="goToTER()">Потребление ТЭР</button>
+    <button onclick="goToMeasures()">Мероприятия</button>
+
     <a id="adminLink" href="admin.html" style="display:none;">Администратор</a>
   </div>
 
@@ -37,10 +38,14 @@
     function goToEnergyPassport() {
       window.location.href = "energy-passport-select.html";
     }
+
     function goToTER() {
       window.location.href = "ter-consumption.html";
     }
-  </script>
 
+    function goToMeasures() {
+      window.location.href = "measures.html";
+    }
+  </script>
 </body>
 </html>
