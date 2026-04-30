@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="assets/favicon.jpg">
 
   <!-- проверка авторизации/ролей -->
-  <script type="module" src="guard.js"></script>
+<!-- <script type="module" src="guard.js"></script> -->
 
   <style>
     body { font-family: Arial, sans-serif; padding: 12px; }
@@ -163,6 +163,7 @@
   <button class="btn" id="downloadPdfBtn" type="button">⬇️ Скачать PDF</button>
   <button class="btn" id="downloadXlsxBtn" type="button">⬇️ Скачать Excel</button>
   <button class="btn" id="downloadChartsPngBtn" type="button">⬇️ Скачать графики PNG</button>
+  <button class="btn" id="downloadWordBtn" type="button">⬇️ Скачать Word</button>
 </div>
 
   <div class="wrap">
@@ -199,7 +200,11 @@
   <!-- Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- logic -->
-<script type="module" src="ter-consumption.js?v=31"></script>
+<!-- Word (.docx) -->
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="ter-word-export.js?v=5"></script>
+
+<!-- logic -->
+<script type="module" src="ter-consumption.js?v=6"></script>
 </body>
 </html>

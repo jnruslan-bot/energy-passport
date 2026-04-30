@@ -26,7 +26,7 @@ const yearlyWrap = document.getElementById("yearlyWrap"); // ✅ из новог
 const downloadPdfBtn = document.getElementById("downloadPdfBtn");
 const downloadXlsxBtn = document.getElementById("downloadXlsxBtn");
 const downloadChartsPngBtn = document.getElementById("downloadChartsPngBtn");
-
+const downloadWordBtn = document.getElementById("downloadWordBtn");
 const TER_STORAGE_KEY = "energy_passport_ter_current_project_v1";
 const TER_PROJECTS_KEY = "energy_passport_ter_projects_v1";
 const TER_ACTIVE_PROJECT_KEY = "energy_passport_ter_active_project_id";
@@ -412,45 +412,7 @@ function pieColors(count) {
   }
   return { bg, br };
 }
-function groupSmallPieItems(labels, values, thresholdPct = 2) {
-  const total = values.reduce((sum, v) => sum + (Number(v) || 0), 0);
 
-  const mainLabels = [];
-  const mainValues = [];
-  const otherItems = [];
-
-  labels.forEach((label, index) => {
-    const value = Number(values[index]) || 0;
-    const pct = total > 0 ? (value / total) * 100 : 0;
-
-    // Если доля меньше порога — уходит в "Прочее"
-    if (value > 0 && pct < thresholdPct) {
-      otherItems.push({
-        label,
-        value,
-        pct
-      });
-    } else if (value > 0) {
-      mainLabels.push(label);
-      mainValues.push(value);
-    }
-  });
-
-  const otherTotal = otherItems.reduce((sum, item) => sum + item.value, 0);
-
-  if (otherTotal > 0) {
-    mainLabels.push("Прочее");
-    mainValues.push(+otherTotal.toFixed(2));
-  }
-
-  return {
-    labels: mainLabels,
-    values: mainValues,
-    otherItems,
-    total,
-    otherTotal
-  };
-}
 // =====================
 // table build
 // =====================
@@ -840,6 +802,7 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       plugins: {
         title: {
           display: true,
@@ -880,10 +843,6 @@ function addLineChartCard(gridEl, id, title, labels, dataArr, yLabel, descriptio
 }
 
 function addPieCard(containerEl, id, title, labels, values, unitLabel) {
-  const grouped = groupSmallPieItems(labels, values, 2);
-
-  labels = grouped.labels;
-  values = grouped.values;
 
   const card = document.createElement("div");
   card.className = "yearCard";
@@ -902,21 +861,31 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
     data: {
       labels,
       datasets: [{
-        label: unitLabel,
-        data: values,
-        backgroundColor: bg,
-        borderColor: br,
-        borderWidth: 1
-      }]
+  label: unitLabel,
+  data: values,
+  backgroundColor: bg,
+  borderColor: br,
+  borderWidth: 1,
+  radius: "72%"
+}]
     },
 
     // Подписи значений на круговой диаграмме
     plugins: window.ChartDataLabels ? [window.ChartDataLabels] : [],
 
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: false,
+  layout: {
+    padding: {
+      top: 35,
+      right: 45,
+      bottom: 40,
+      left: 45
+    }
+  },
+  plugins: {
         title: { display: true, text: title },
         legend: {
   position: "bottom",
@@ -944,28 +913,56 @@ function addPieCard(containerEl, id, title, labels, values, unitLabel) {
 },
 
         // Значения на секторах круговой диаграммы
-        datalabels: {
-          display: true,
-          color: "#111",
-          font: {
-            weight: "bold",
-            size: 11
-          },
-          formatter: (value, context) => {
-            const arr = context.chart.data.datasets[0].data || [];
-            const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
-            const n = Number(value);
+datalabels: {
+  display: true,
+  color: "#111",
+  font: {
+    weight: "bold",
+    size: 10
+  },
+  textAlign: "center",
+  clamp: true,
+  clip: false,
 
-            if (!Number.isFinite(n) || n <= 0 || sum <= 0) return "";
+  anchor: (context) => {
+    const arr = context.chart.data.datasets[0].data || [];
+    const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+    const p = sum > 0 ? value / sum * 100 : 0;
 
-            const p = n / sum * 100;
+    return p < 5 ? "end" : "center";
+  },
 
-            // Чтобы подписи не налезали: очень маленькие сектора не подписываем на самом круге
-            if (p < 3) return "";
+  align: (context) => {
+    const arr = context.chart.data.datasets[0].data || [];
+    const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+    const p = sum > 0 ? value / sum * 100 : 0;
 
-            return `${fmt2(n)} (${fmt2(p)}%)`;
-          }
-        },
+    return p < 5 ? "end" : "center";
+  },
+
+  offset: (context) => {
+    const arr = context.chart.data.datasets[0].data || [];
+    const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+    const value = Number(context.dataset.data[context.dataIndex]) || 0;
+    const p = sum > 0 ? value / sum * 100 : 0;
+
+    return p < 5 ? 18 : 0;
+  },
+
+  formatter: (value, context) => {
+    const arr = context.chart.data.datasets[0].data || [];
+    const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+    const n = Number(value);
+
+    if (!Number.isFinite(n) || n <= 0 || sum <= 0) return "";
+
+    const p = n / sum * 100;
+
+    return `${fmt2(n)}\n(${fmt2(p)}%)`;
+  }
+},
 
         tooltip: {
           callbacks: {
@@ -1799,105 +1796,7 @@ function renderDescriptionsOnPage(years) {
 
   block.innerHTML = html;
 }
-function buildOtherBreakdownAoa(years) {
-  const aoa = [];
 
-  aoa.push([`Таблица. Расшифровка сектора «Прочее» по годам за ${years[0]}–${years[years.length - 1]} гг.`]);
-  aoa.push([]);
-
-  years.forEach((y) => {
-    const rows = blocks.map((b) => {
-      const name = b.resourceName || "—";
-      const k = getK(b);
-
-      const nat = getCellValueOrNull(b, y, "natural");
-      const mon = getCellValueOrNull(b, y, "money");
-
-      const tut = (nat !== null && k > 0) ? nat * k : 0;
-      const money = (mon !== null && mon > 0) ? mon : 0;
-
-      return { name, tut, money };
-    });
-
-    const tutItems = rows
-      .filter(r => r.tut > 0)
-      .map(r => ({ label: r.name, value: +r.tut.toFixed(2) }));
-
-    const moneyItems = rows
-      .filter(r => r.money > 0)
-      .map(r => ({ label: r.name, value: +r.money.toFixed(2) }));
-
-    const tutGrouped = groupSmallPieItems(
-      tutItems.map(x => x.label),
-      tutItems.map(x => x.value),
-      2
-    );
-
-    const moneyGrouped = groupSmallPieItems(
-      moneyItems.map(x => x.label),
-      moneyItems.map(x => x.value),
-      2
-    );
-
-    // ===== т.у.т =====
-    if (tutGrouped.otherItems.length) {
-      aoa.push([`Год: ${y}`]);
-      aoa.push([`Расшифровка сектора «Прочее» — т.у.т`]);
-      aoa.push(["Энергоресурс", "т.у.т", "Доля в итоге, %", "Доля внутри «Прочее», %"]);
-
-      tutGrouped.otherItems.forEach(item => {
-        const pctOfTotal = tutGrouped.total > 0 ? item.value / tutGrouped.total * 100 : 0;
-        const pctOfOther = tutGrouped.otherTotal > 0 ? item.value / tutGrouped.otherTotal * 100 : 0;
-
-        aoa.push([
-          item.label,
-          Number(item.value),
-          Number(pctOfTotal),
-          Number(pctOfOther)
-        ]);
-      });
-
-      aoa.push([
-        "ИТОГО «Прочее»",
-        Number(tutGrouped.otherTotal),
-        tutGrouped.total > 0 ? Number(tutGrouped.otherTotal / tutGrouped.total * 100) : "",
-        100
-      ]);
-
-      aoa.push([]);
-    }
-
-    // ===== тг. =====
-    if (moneyGrouped.otherItems.length) {
-      aoa.push([`Год: ${y}`]);
-      aoa.push([`Расшифровка сектора «Прочее» — тг.`]);
-      aoa.push(["Энергоресурс", "тг.", "Доля в итоге, %", "Доля внутри «Прочее», %"]);
-
-      moneyGrouped.otherItems.forEach(item => {
-        const pctOfTotal = moneyGrouped.total > 0 ? item.value / moneyGrouped.total * 100 : 0;
-        const pctOfOther = moneyGrouped.otherTotal > 0 ? item.value / moneyGrouped.otherTotal * 100 : 0;
-
-        aoa.push([
-          item.label,
-          Number(item.value),
-          Number(pctOfTotal),
-          Number(pctOfOther)
-        ]);
-      });
-
-      aoa.push([
-        "ИТОГО «Прочее»",
-        Number(moneyGrouped.otherTotal),
-        moneyGrouped.total > 0 ? Number(moneyGrouped.otherTotal / moneyGrouped.total * 100) : "",
-        100
-      ]);
-
-      aoa.push([]);
-    }
-  });
-
-  return aoa;
-}
 async function downloadXlsx() {
   if (!window.XLSX) {
     alert("XLSX-библиотека не загрузилась. Проверь подключение xlsx.full.min.js в HTML.");
@@ -2053,20 +1952,7 @@ wsTot["!cols"] = [
       { wch: 28 }, { wch: 18 }, { wch: 18 }, { wch: 14 }, { wch: 14 },
     ];
 window.XLSX.utils.book_append_sheet(wb, wsStructDelta, "Структура_Δ");
-const aoaOther = buildOtherBreakdownAoa(years);
 
-if (aoaOther.length > 2) {
-  const wsOther = window.XLSX.utils.aoa_to_sheet(aoaOther);
-
-  wsOther["!cols"] = [
-    { wch: 28 },
-    { wch: 16 },
-    { wch: 18 },
-    { wch: 24 }
-  ];
-
-  window.XLSX.utils.book_append_sheet(wb, wsOther, "Прочее");
-}
 const s = Number(startYearEl.value);
 const e = Number(endYearEl.value);
 window.XLSX.writeFile(wb, `Потребление_ТЭР_${s}-${e}.xlsx`);
@@ -2198,7 +2084,524 @@ async function downloadChartsPng() {
     downloadBlobUrl(dataUrl, name);
   }
 }
+// =====================
+// Word export helpers
+// =====================
+function buildWordDeltaAoa(labels, vals) {
+  const v = vals.map(x => (x === null || x === undefined ? null : Number(x)));
+  const baseIdx = v.findIndex(x => x !== null && Number.isFinite(x));
+  const base = baseIdx >= 0 ? v[baseIdx] : null;
 
+  const aoa = [];
+  aoa.push(["Год", "Значение", "Δ к пред. году", "Δ%, к пред. году", "Индекс, %"]);
+
+  for (let i = 0; i < labels.length; i++) {
+    const cur = v[i] !== null && Number.isFinite(v[i]) ? v[i] : null;
+    const prev = i > 0 && v[i - 1] !== null && Number.isFinite(v[i - 1]) ? v[i - 1] : null;
+
+    let d = "";
+    let dp = "";
+    let idx = "";
+
+    if (cur !== null && prev !== null) {
+      d = cur - prev;
+      dp = prev !== 0 ? (d / prev) * 100 : "";
+    }
+
+    if (cur !== null && base !== null && base !== 0) {
+      idx = (cur / base) * 100;
+    }
+
+    aoa.push([
+      labels[i],
+      cur ?? "",
+      d === "" ? "" : d,
+      dp === "" ? "" : dp,
+      idx === "" ? "" : idx,
+    ]);
+  }
+
+  return aoa;
+}
+function buildWordTotalDeltaSections(years) {
+  const labels = years.map(String);
+
+  const totalTut = years.map(y => {
+    let sum = 0;
+    let has = false;
+
+    blocks.forEach(b => {
+      const nat = getCellValueOrNull(b, y, "natural");
+      const k = getK(b);
+
+      if (nat !== null && k > 0) {
+        sum += nat * k;
+        has = true;
+      }
+    });
+
+    return has ? sum : null;
+  });
+
+  const totalMoney = years.map(y => {
+    let sum = 0;
+    let has = false;
+
+    blocks.forEach(b => {
+      const m = getCellValueOrNull(b, y, "money");
+
+      if (m !== null) {
+        sum += m;
+        has = true;
+      }
+    });
+
+    return has ? sum : null;
+  });
+
+  const totalCost = years.map((_, i) => {
+    const t = totalTut[i];
+    const m = totalMoney[i];
+
+    return t !== null && t !== 0 && m !== null ? m / t : null;
+  });
+
+  return [
+    {
+      title: "ИТОГО: в условном топливе",
+      unit: "т.у.т",
+      aoa: buildWordDeltaAoa(labels, totalTut),
+      description: trendDescription("ИТОГО: в условном топливе", "т.у.т", labels, totalTut),
+    },
+    {
+      title: "ИТОГО: в денежном выражении",
+      unit: "тг.",
+      aoa: buildWordDeltaAoa(labels, totalMoney),
+      description: trendDescription("ИТОГО: в денежном выражении", "тг.", labels, totalMoney),
+    },
+    {
+      title: "ИТОГО: себестоимость",
+      unit: "тг/т.у.т",
+      aoa: buildWordDeltaAoa(labels, totalCost),
+      description: trendDescription("ИТОГО: себестоимость", "тг/т.у.т", labels, totalCost),
+    },
+  ];
+}
+
+function getWordTotalChartImages() {
+  const charts = [
+    {
+      id: "tot_tut",
+      title: "ИТОГО: в условном топливе",
+      caption: "Рисунок — Динамика суммарного потребления ТЭР в условном топливе",
+    },
+    {
+      id: "tot_money",
+      title: "ИТОГО: в денежном выражении",
+      caption: "Рисунок — Динамика суммарного потребления ТЭР в денежном выражении",
+    },
+    {
+      id: "tot_cost",
+      title: "ИТОГО: себестоимость",
+      caption: "Рисунок — Динамика суммарной себестоимости потребления ТЭР",
+    },
+  ];
+
+  return charts
+    .map((item) => {
+      const canvas = document.getElementById(item.id);
+
+      if (!canvas || !chartHasFilledData(canvas)) {
+        return null;
+      }
+
+      return {
+        ...item,
+        dataUrl: canvasToPngWithWhiteBg(canvas),
+      };
+    })
+    .filter(Boolean);
+}
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function getChartImageById(id) {
+  const sourceCanvas = document.getElementById(id);
+
+  if (!sourceCanvas || !chartHasFilledData(sourceCanvas)) {
+    return null;
+  }
+
+  const sourceChart = chartInstances.get(id);
+
+  if (!sourceChart || sourceChart.config?.type !== "pie") {
+    return canvasToPngWithWhiteBg(sourceCanvas);
+  }
+
+  const tmpCanvas = document.createElement("canvas");
+  tmpCanvas.width = 700;
+  tmpCanvas.height = 700;
+
+  const ctx = tmpCanvas.getContext("2d");
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+
+  const originalData = sourceChart.data;
+  const originalDataset = originalData.datasets?.[0] || {};
+
+  const data = {
+    labels: [...(originalData.labels || [])],
+    datasets: [
+      {
+        label: originalDataset.label || "",
+        data: [...(originalDataset.data || [])],
+        backgroundColor: [...(originalDataset.backgroundColor || [])],
+        borderColor: [...(originalDataset.borderColor || [])],
+        borderWidth: originalDataset.borderWidth || 1,
+        radius: "62%",
+      },
+    ],
+  };
+
+  const tmpChart = new window.Chart(ctx, {
+    type: "pie",
+    data,
+    plugins: window.ChartDataLabels ? [window.ChartDataLabels] : [],
+    options: {
+      responsive: false,
+      maintainAspectRatio: true,
+      animation: false,
+      layout: {
+        padding: {
+          top: 90,
+          right: 80,
+          bottom: 100,
+          left: 80,
+        },
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: sourceChart.options?.plugins?.title?.text || "",
+          font: {
+            size: 16,
+            weight: "bold",
+          },
+        },
+        legend: {
+          position: "bottom",
+          labels: {
+            font: {
+              size: 13,
+            },
+          },
+        },
+        datalabels: {
+          display: true,
+          color: "#111",
+          font: {
+            weight: "bold",
+            size: 12,
+          },
+          textAlign: "center",
+          clamp: true,
+          clip: false,
+
+          anchor: (context) => {
+            const arr = context.chart.data.datasets[0].data || [];
+            const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+            const value = Number(context.dataset.data[context.dataIndex]) || 0;
+            const p = sum > 0 ? value / sum * 100 : 0;
+
+            return p < 5 ? "end" : "center";
+          },
+
+          align: (context) => {
+            const arr = context.chart.data.datasets[0].data || [];
+            const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+            const value = Number(context.dataset.data[context.dataIndex]) || 0;
+            const p = sum > 0 ? value / sum * 100 : 0;
+
+            return p < 5 ? "end" : "center";
+          },
+
+          offset: (context) => {
+            const arr = context.chart.data.datasets[0].data || [];
+            const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+            const value = Number(context.dataset.data[context.dataIndex]) || 0;
+            const p = sum > 0 ? value / sum * 100 : 0;
+
+            return p < 5 ? 22 : 0;
+          },
+
+          formatter: (value, context) => {
+            const arr = context.chart.data.datasets[0].data || [];
+            const sum = arr.reduce((a, b) => a + (Number(b) || 0), 0);
+            const n = Number(value);
+
+            if (!Number.isFinite(n) || n <= 0 || sum <= 0) return "";
+
+            const p = (n / sum) * 100;
+
+            return `${fmt2(n)}\n(${fmt2(p)}%)`;
+          },
+        },
+      },
+    },
+  });
+
+  tmpChart.update("none");
+
+  await delay(50);
+
+  const dataUrl = tmpCanvas.toDataURL("image/png");
+
+  tmpChart.destroy();
+
+  return dataUrl;
+}
+async function buildWordYearlyStructureSections(years) {
+  const sections = [];
+
+  for (const y of years) {
+    const rows = blocks.map((b) => {
+      const name = b.resourceName || "—";
+      const k = getK(b);
+
+      const nat = getCellValueOrNull(b, y, "natural");
+      const mon = getCellValueOrNull(b, y, "money");
+
+      const tut = nat !== null && k > 0 ? nat * k : 0;
+      const money = mon !== null && mon > 0 ? mon : 0;
+
+      return {
+        name,
+        tut,
+        money,
+      };
+    });
+
+    const sumTut = rows.reduce((sum, r) => sum + (Number(r.tut) || 0), 0);
+    const sumMoney = rows.reduce((sum, r) => sum + (Number(r.money) || 0), 0);
+
+    const tableAoa = [
+      ["Энергоресурс", "т.у.т", "Доля, %", "тг.", "Доля, %"],
+    ];
+
+    rows
+      .filter((r) => r.tut > 0 || r.money > 0)
+      .forEach((r) => {
+        const pTut = sumTut > 0 && r.tut > 0 ? (r.tut / sumTut) * 100 : "";
+        const pMoney = sumMoney > 0 && r.money > 0 ? (r.money / sumMoney) * 100 : "";
+
+        tableAoa.push([
+          r.name,
+          r.tut > 0 ? r.tut : "",
+          pTut === "" ? "" : pTut,
+          r.money > 0 ? r.money : "",
+          pMoney === "" ? "" : pMoney,
+        ]);
+      });
+
+    if (sumTut > 0 || sumMoney > 0) {
+      tableAoa.push([
+        "ИТОГО",
+        sumTut > 0 ? sumTut : "",
+        sumTut > 0 ? 100 : "",
+        sumMoney > 0 ? sumMoney : "",
+        sumMoney > 0 ? 100 : "",
+      ]);
+    }
+
+    const topTut = topN(
+      rows
+        .filter((r) => r.tut > 0)
+        .map((r) => ({ name: r.name, value: r.tut })),
+      2
+    );
+
+    const topMoney = topN(
+      rows
+        .filter((r) => r.money > 0)
+        .map((r) => ({ name: r.name, value: r.money })),
+      2
+    );
+
+    const tutText =
+      sumTut > 0 && topTut.length
+        ? `По структуре в условном топливе наибольшую долю занимают: ${topTut
+            .map((item) => `${item.name} — ${fmt2(percent(item.value, sumTut))} %`)
+            .join(", ")}.`
+        : "По структуре в условном топливе данных недостаточно.";
+
+    const moneyText =
+      sumMoney > 0 && topMoney.length
+        ? `По структуре в денежном выражении наибольшую долю занимают: ${topMoney
+            .map((item) => `${item.name} — ${fmt2(percent(item.value, sumMoney))} %`)
+            .join(", ")}.`
+        : "По структуре в денежном выражении данных недостаточно.";
+
+    const section = {
+      year: y,
+      tutChart: {
+        title: `Структура потребления ТЭР в т.у.т за ${y} год`,
+        caption: `Рисунок — Структура потребления ТЭР в условном топливе за ${y} год`,
+        dataUrl: await getChartImageById(`y${y}_tut`),
+      },
+      moneyChart: {
+        title: `Структура потребления ТЭР в тг. за ${y} год`,
+        caption: `Рисунок — Структура потребления ТЭР в денежном выражении за ${y} год`,
+        dataUrl: await getChartImageById(`y${y}_money`),
+      },
+      tableAoa,
+      description: `${tutText} ${moneyText}`,
+    };
+
+    if (
+      section.tutChart.dataUrl ||
+      section.moneyChart.dataUrl ||
+      section.tableAoa.length > 1
+    ) {
+      sections.push(section);
+    }
+  }
+
+  return sections;
+}
+function buildWordResourceTableAoa(block, years) {
+  const name = block.resourceName || "Энергоресурс";
+  const unit = getUnit(block) || "ед.";
+  const k = getK(block);
+
+  const rows = [
+    ["Показатель", "Ед. изм.", ...years.map(String)]
+  ];
+
+  const naturalRow = ["В натуральном выражении", unit];
+  const tutRow = ["В условном топливе", "т.у.т"];
+  const moneyRow = ["В денежном выражении", "тг."];
+  const costRow = ["Себестоимость", costUnitFrom(unit)];
+
+  years.forEach((y) => {
+    const nat = getCellValueOrNull(block, y, "natural");
+    const mon = getCellValueOrNull(block, y, "money");
+
+    const tut = nat !== null && k > 0 ? nat * k : "";
+    const cost = nat !== null && nat !== 0 && mon !== null ? mon / nat : "";
+
+    naturalRow.push(nat !== null ? nat : "");
+    tutRow.push(tut !== "" ? tut : "");
+    moneyRow.push(mon !== null ? mon : "");
+    costRow.push(cost !== "" ? cost : "");
+  });
+
+  rows.push(naturalRow);
+  rows.push(tutRow);
+  rows.push(moneyRow);
+  rows.push(costRow);
+
+  return rows;
+}
+
+function buildWordResourceTableDescription(block, years) {
+  const name = block.resourceName || "энергоресурс";
+  const unit = getUnit(block) || "ед.";
+  const k = getK(block);
+
+  const periodText =
+    Array.isArray(years) && years.length
+      ? `${years[0]}–${years[years.length - 1]} гг.`
+      : "рассматриваемый период";
+
+  const coefficientText =
+    k > 0
+      ? k.toLocaleString("ru-RU", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 8,
+        })
+      : "не указан";
+
+  return `В таблице приведены сведения о потреблении энергоресурса «${name}» за ${periodText}. Значения отражены в натуральном выражении (${unit}), в условном топливе, в денежном выражении и по расчетной себестоимости. Перевод в условное топливо выполнен с применением коэффициента ${coefficientText} т.у.т./${unit}. Себестоимость определена как отношение потребления в денежном выражении к потреблению в натуральном выражении.`;
+}
+
+function getWordChartImageById(id) {
+  const canvas = document.getElementById(id);
+
+  if (!canvas || !chartHasFilledData(canvas)) {
+    return null;
+  }
+
+  return canvasToPngWithWhiteBg(canvas);
+}
+
+function buildWordResourceSections(years) {
+  const labels = years.map(String);
+  const sections = [];
+
+  blocks.forEach((block, bi) => {
+    const name = block.resourceName || `ТЭР ${bi + 1}`;
+    const unit = getUnit(block) || "ед.";
+
+    const hasData = years.some((y) => {
+      return (
+        getCellValueOrNull(block, y, "natural") !== null ||
+        getCellValueOrNull(block, y, "money") !== null
+      );
+    });
+
+    if (!hasData) return;
+
+    const natural = years.map((y) => getCellValueOrNull(block, y, "natural"));
+    const money = years.map((y) => getCellValueOrNull(block, y, "money"));
+
+    const cost = years.map((_, i) => {
+      const n = natural[i];
+      const m = money[i];
+
+      return n !== null && n !== 0 && m !== null ? m / n : null;
+    });
+
+    const chartSections = [
+      {
+        title: `${name}: в натуральном выражении`,
+        caption: `Рисунок — Динамика потребления энергоресурса «${name}» в натуральном выражении`,
+        chartId: `b${bi}_nat`,
+        unit,
+        aoa: buildWordDeltaAoa(labels, natural),
+        description: trendDescription(`${name}: в натуральном выражении`, unit, labels, natural),
+      },
+      {
+        title: `${name}: в денежном выражении`,
+        caption: `Рисунок — Динамика потребления энергоресурса «${name}» в денежном выражении`,
+        chartId: `b${bi}_money`,
+        unit: "тг.",
+        aoa: buildWordDeltaAoa(labels, money),
+        description: trendDescription(`${name}: в денежном выражении`, "тг.", labels, money),
+      },
+      {
+        title: `${name}: себестоимость`,
+        caption: `Рисунок — Динамика себестоимости потребления энергоресурса «${name}»`,
+        chartId: `b${bi}_cost`,
+        unit: costUnitFrom(unit),
+        aoa: buildWordDeltaAoa(labels, cost),
+        description: trendDescription(`${name}: себестоимость`, costUnitFrom(unit), labels, cost),
+      },
+    ].map((item) => ({
+      ...item,
+      dataUrl: getWordChartImageById(item.chartId),
+    }));
+
+    sections.push({
+      name,
+      tableAoa: buildWordResourceTableAoa(block, years),
+      tableDescription: buildWordResourceTableDescription(block, years),
+      chartSections,
+    });
+  });
+
+  return sections;
+}
 // =====================
 // bind handlers (один раз)
 // =====================
@@ -2225,7 +2628,57 @@ addTerBtn?.addEventListener("click", () => addBlock(""));
 downloadPdfBtn?.addEventListener("click", downloadPdf);
 downloadXlsxBtn?.addEventListener("click", downloadXlsx);
 downloadChartsPngBtn?.addEventListener("click", downloadChartsPng);
+downloadWordBtn?.addEventListener("click", async () => {
+  if (!window.downloadTerWord) {
+    alert("Модуль Word-выгрузки не загружен.");
+    return;
+  }
 
+  const years = getYears();
+
+  if (!years.length) {
+    alert("Проверь годы.");
+    return;
+  }
+
+  // Обновляем графики перед снятием PNG
+  renderAllVisuals(years);
+  await delay(500);
+
+  const projects = getProjects();
+  const activeId = getActiveProjectId();
+  const project = projects[activeId];
+
+  const terInfo = blocks
+    .map((b) => {
+      const hasData = years.some((y) => {
+        return (
+          getCellValueOrNull(b, y, "natural") !== null ||
+          getCellValueOrNull(b, y, "money") !== null
+        );
+      });
+
+      return {
+        name: b.resourceName || "",
+        unit: getUnit(b) || "",
+        k: getK(b) || 0,
+        hasData,
+      };
+    })
+    .filter((item) => item.name && item.hasData);
+
+window.downloadTerWord({
+  years,
+  project,
+  mainTableAoa: buildMainTableAoa(years),
+  yearlyStructureAoa: buildYearlyStructureAoa(years),
+  terInfo,
+  totalDeltaSections: buildWordTotalDeltaSections(years),
+  totalChartImages: getWordTotalChartImages(),
+  yearlyStructureSections: await buildWordYearlyStructureSections(years),
+  resourceSections: buildWordResourceSections(years),
+});
+});
 // =====================
 // init
 // =====================
