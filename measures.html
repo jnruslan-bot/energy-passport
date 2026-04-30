@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Мероприятия по энергосбережению</title>
+
+  <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+  <link rel="apple-touch-icon" href="assets/favicon.jpg">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 7px 12px;
+      border: 1px solid #999;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #000;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: #f2f2f2;
+    }
+
+    .note {
+      max-width: 900px;
+      color: #444;
+      font-size: 14px;
+      line-height: 1.45;
+      margin-bottom: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      max-width: 1100px;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .card h2 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 0 0 14px 0;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <a class="btn" href="dashboard.html">← Назад</a>
+    <a class="btn" href="index.html">🏠 На главную</a>
+  </div>
+
+  <h1>Мероприятия по энергосбережению</h1>
+
+  <div class="note">
+    На данной странице выполняется выбор направления мероприятий по энергосбережению.
+    Далее по каждому направлению можно будет сделать отдельные расчетные страницы:
+    экономия, инвестиции, срок окупаемости, IRR, NPV/КЧПС и выгрузка в Word.
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Электроэнергия</h2>
+      <p>Освещение, электродвигатели, компенсация реактивной мощности, автоматизация, диспетчеризация.</p>
+      <a class="btn" href="measures-electricity.html">Открыть</a>
+    </div>
+
+    <div class="card">
+      <h2>Тепловая энергия</h2>
+      <p>Окна, двери, теплоизоляция, погодозависимое регулирование, радиаторные экраны.</p>
+      <a class="btn" href="measures-heat.html">Открыть</a>
+    </div>
+
+    <div class="card">
+      <h2>Вода</h2>
+      <p>Аэраторы, регулировка сливных бачков, устранение утечек, учет воды.</p>
+      <a class="btn" href="measures-water.html">Открыть</a>
+    </div>
+
+    <div class="card">
+      <h2>Природный газ</h2>
+      <p>Настройка котлов, восстановление учета, регулирование горения, снижение тепловых потерь.</p>
+      <a class="btn" href="measures-gas.html">Открыть</a>
+    </div>
+
+    <div class="card">
+      <h2>Топливо</h2>
+      <p>Бензин, дизельное топливо, транспорт, учет, маршрутизация, контроль простоев.</p>
+      <a class="btn" href="measures-fuel.html">Открыть</a>
+    </div>
+
+    <div class="card">
+      <h2>Организационные мероприятия</h2>
+      <p>Энергоменеджмент, регламенты, контроль режимов работы, обучение персонала.</p>
+      <a class="btn" href="measures-organizational.html">Открыть</a>
+    </div>
+  </div>
+</body>
+</html>
