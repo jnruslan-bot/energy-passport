@@ -2049,10 +2049,12 @@ if (betaVEl) {
     // 5) Геометрия авто
     ["s2_f_fact", "s2_kkomp_fact", "s2_afas_fact", "s2_ansum_fact"].forEach(lockField);
 
-// 5.1) Таблица 4 (пв):
+// 5.1) Таблица 4: расчетные авто-поля
 // norm — всегда пустое и disabled
 disableField("s4_pv_norm");
-// proj — авто, но показываем
+
+// proj — авто, но показываем и не даем редактировать вручную
+lockField("s4_kobsh_proj");
 lockField("s4_pv_proj");
 
     // 6) Нормативы Таблица 4 — авто
