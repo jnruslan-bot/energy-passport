@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>План мероприятий</title>
+
+  <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+  <link rel="apple-touch-icon" href="assets/favicon.jpg">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+    }
+
+    h2 {
+      margin: 22px 0 8px;
+      font-size: 18px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .top-form {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      background: #fafafa;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: #333;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 5px;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+    }
+
+    textarea {
+      min-height: 44px;
+      resize: vertical;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #555;
+      margin: 8px 0 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #ddd;
+      margin-bottom: 18px;
+    }
+
+    table {
+      border-collapse: collapse;
+      min-width: 1800px;
+      width: 100%;
+      background: white;
+    }
+
+    th,
+    td {
+      border: 1px solid #777;
+      padding: 5px;
+      text-align: center;
+      vertical-align: top;
+      font-size: 12px;
+    }
+
+    th {
+      background: #f1f1f1;
+      font-weight: 600;
+    }
+
+    td.left {
+      text-align: left;
+    }
+
+    .zone-row td {
+      background: #eaeaea;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .total-row td {
+      background: #f7f7f7;
+      font-weight: 700;
+    }
+
+    .readonly {
+      border: none;
+      background: transparent;
+      text-align: center;
+    }
+
+    .codes {
+      font-size: 13px;
+      line-height: 1.5;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: #fafafa;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="actions">
+    <button onclick="location.href='dashboard.html'">← Рабочая зона</button>
+    <button onclick="location.href='measures.html'">↩ Мероприятия</button>
+  </div>
+
+  <h1>План мероприятий по энергосбережению и повышению энергоэффективности</h1>
+
+  <div class="note">
+    Форма подготовлена по требованиям к форме и содержанию плана мероприятий по энергосбережению и повышению энергоэффективности.
+  </div>
+
+  <div class="top-form">
+    <div class="field">
+      <label for="orgName">Полное наименование организации</label>
+      <input id="orgName" placeholder="например, ТОО «...»">
+    </div>
+
+    <div class="field">
+      <label for="planYearFrom">План на период с</label>
+      <input id="planYearFrom" type="number" min="2000" max="2100" placeholder="2026">
+    </div>
+
+    <div class="field">
+      <label for="planYearTo">по</label>
+      <input id="planYearTo" type="number" min="2000" max="2100" placeholder="2030">
+    </div>
+
+    <div class="field">
+      <label for="approvalDate">Дата утверждения</label>
+      <input id="approvalDate" type="date">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button id="savePlanBtn">Сохранить</button>
+    <button id="clearPlanBtn">Очистить форму</button>
+  </div>
+
+  <!-- ТАБЛИЦА 1 -->
+  <h2>Таблица 1. План мероприятий по зонам энергосбережения</h2>
+
+  <div class="note">
+    Таблица 1 содержит код и номер мероприятия, наименование мероприятия, период реализации, планируемые расходы по годам, единицу измерения, объем планируемого снижения потребления энергетических ресурсов, срок окупаемости и отметку о выполнении.
+  </div>
+
+  <div class="toolbar">
+    <button id="addTable1RowBtn">+ Добавить мероприятие в Таблицу 1</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="table1">
+      <thead>
+        <tr>
+          <th rowspan="2" style="width:80px">Код и номер</th>
+          <th rowspan="2" style="width:260px">Мероприятия</th>
+          <th rowspan="2" style="width:130px">Период реализации<br>(с - до)</th>
+          <th colspan="5">Планируемые расходы, млн. тенге</th>
+          <th rowspan="2" style="width:110px">Единица измерения</th>
+          <th colspan="5">Объем планируемого снижения потребления энергетических ресурсов в натуральном выражении</th>
+          <th rowspan="2" style="width:100px">Срок окупаемости, лет</th>
+          <th rowspan="2" style="width:180px">Отметка о выполнении</th>
+        </tr>
+        <tr>
+          <th class="year-y1">20__</th>
+          <th class="year-y2">20__</th>
+          <th class="year-y3">20__</th>
+          <th class="year-y4">20__</th>
+          <th class="year-y5">20__</th>
+          <th class="year-y1">20__</th>
+          <th class="year-y2">20__</th>
+          <th class="year-y3">20__</th>
+          <th class="year-y4">20__</th>
+          <th class="year-y5">20__</th>
+        </tr>
+        <tr>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+          <th>6</th>
+          <th>7</th>
+          <th>8</th>
+          <th>9</th>
+          <th>10</th>
+          <th>11</th>
+          <th>12</th>
+          <th>13</th>
+          <th>14</th>
+          <th>15</th>
+          <th>16</th>
+        </tr>
+      </thead>
+      <tbody id="table1Body"></tbody>
+    </table>
+  </div>
+
+  <!-- ТАБЛИЦА 2 -->
+  <h2>Таблица 2. Свод планируемого снижения потребления энергетических ресурсов</h2>
+
+  <div class="note">
+    Таблица 2 предназначена для свода экономии по видам энергетических ресурсов: натуральная экономия, суммарное снижение, планируемая экономия в млн. тенге, уменьшение максимальной мощности, потенциал снижения и отметка о выполнении.
+  </div>
+
+  <div class="toolbar">
+    <button id="addTable2RowBtn">+ Добавить энергетический ресурс</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="table2">
+      <thead>
+        <tr>
+          <th rowspan="2" style="width:50px">№</th>
+          <th rowspan="2" style="width:180px">Наименование энергетического ресурса</th>
+          <th rowspan="2" style="width:100px">Единица измерения</th>
+          <th colspan="5">Объем планируемого снижения потребления энергетических ресурсов</th>
+          <th rowspan="2" style="width:120px">Суммарный объем снижения</th>
+          <th colspan="5">Планируемая экономия, млн. тенге</th>
+          <th rowspan="2" style="width:120px">Объем планируемой экономии, млн. тенге</th>
+          <th rowspan="2" style="width:130px">Возможное уменьшение максимальной мощности</th>
+          <th rowspan="2" style="width:120px">Потенциал снижения, %</th>
+          <th rowspan="2" style="width:180px">Отметка о выполнении</th>
+        </tr>
+        <tr>
+          <th class="year-y1">20__</th>
+          <th class="year-y2">20__</th>
+          <th class="year-y3">20__</th>
+          <th class="year-y4">20__</th>
+          <th class="year-y5">20__</th>
+          <th class="year-y1">20__</th>
+          <th class="year-y2">20__</th>
+          <th class="year-y3">20__</th>
+          <th class="year-y4">20__</th>
+          <th class="year-y5">20__</th>
+        </tr>
+        <tr>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+          <th>6</th>
+          <th>7</th>
+          <th>8</th>
+          <th>9</th>
+          <th>10</th>
+          <th>11</th>
+          <th>12</th>
+          <th>13</th>
+          <th>14</th>
+          <th>15</th>
+          <th>16</th>
+          <th>17</th>
+          <th>18</th>
+        </tr>
+      </thead>
+      <tbody id="table2Body"></tbody>
+    </table>
+  </div>
+
+  <!-- ТАБЛИЦА 3 -->
+  <h2>Таблица 3. Снижение удельных показателей</h2>
+
+  <div class="note">
+    Таблица 3 отражает планируемое снижение потребления энергетических ресурсов на единицу продукции, работ, услуг или площади здания.
+  </div>
+
+  <div class="toolbar">
+    <button id="addTable3RowBtn">+ Добавить удельный показатель</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="table3">
+      <thead>
+        <tr>
+          <th rowspan="2" style="width:100px">Код и номер</th>
+          <th rowspan="2" style="width:260px">Наименование удельного показателя</th>
+          <th rowspan="2" style="width:180px">Единица измерения используемых коэффициентов энергоэффективности</th>
+          <th colspan="5">Объем планируемого снижения потребления энергетических ресурсов на единицу продукции / площади</th>
+        </tr>
+        <tr>
+          <th class="year-y1">20__</th>
+          <th class="year-y2">20__</th>
+          <th class="year-y3">20__</th>
+          <th class="year-y4">20__</th>
+          <th class="year-y5">20__</th>
+        </tr>
+        <tr>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+          <th>6</th>
+          <th>7</th>
+          <th>8</th>
+        </tr>
+      </thead>
+      <tbody id="table3Body"></tbody>
+    </table>
+  </div>
+
+  <h2>Значение кодов мероприятий</h2>
+
+  <div class="codes">
+    1) ЭиОс. — электроснабжение и освещение;<br>
+    2) ТиОт. — теплоснабжение и отопление;<br>
+    3) ВКУ. — вентиляция, кондиционирование, увлажнение;<br>
+    4) ВиВ. — водоснабжение и водоотведение;<br>
+    5) ТО. — технологическое оборудование;<br>
+    6) ПУ. — приборы и средства учета и контроля, в том числе автоматизированные системы;<br>
+    7) ЭМ. — энергоменеджмент;<br>
+    8) ППК. — переподготовка и повышение квалификации;<br>
+    9) ТТ. — твердое топливо;<br>
+    10) Газ. — газ;<br>
+    11) ЖТ. — жидкое топливо;<br>
+    12) ЭЭ. — электрическая энергия;<br>
+    13) ТЭ. — тепловая энергия;<br>
+    14) В. — вода;<br>
+    15) т.у.т. — тонна условного топлива.
+  </div>
+
+  <script type="module" src="guard.js"></script>
+  <script src="measures-plan.js"></script>
+</body>
+</html>
