@@ -222,6 +222,47 @@ function createZoneRow(zoneName, colCount, zoneCode = "") {
     hint.textContent = "Выберите зону энергосбережения, чтобы открыть таблицу для заполнения мероприятий по выбранной зоне.";
   }
 }
+function removeTable1PlanTotals() {
+  document.querySelectorAll("#table1Body tr[data-plan-total-row]").forEach((tr) => {
+    tr.remove();
+  });
+}
+
+function appendTable1PlanTotals() {
+  const body = $("table1Body");
+  if (!body) return;
+
+  removeTable1PlanTotals();
+
+  const hasAnyZone = Boolean(body.querySelector("tr[data-zone-header]"));
+  if (!hasAnyZone) return;
+
+  const planTotal = document.createElement("tr");
+  planTotal.className = "total-row";
+  planTotal.dataset.planTotalRow = "total";
+  planTotal.innerHTML = `
+    <td colspan="3" class="left">Итого по плану</td>
+    <td colspan="5"></td>
+    <td></td>
+    <td colspan="5"></td>
+    <td></td>
+    <td></td>
+  `;
+  body.appendChild(planTotal);
+
+  const planAll = document.createElement("tr");
+  planAll.className = "total-row";
+  planAll.dataset.planTotalRow = "all";
+  planAll.innerHTML = `
+    <td colspan="3" class="left">Всего по плану</td>
+    <td colspan="5"></td>
+    <td></td>
+    <td colspan="5"></td>
+    <td></td>
+    <td></td>
+  `;
+  body.appendChild(planAll);
+}
 function openTable1Zone(zoneCode) {
   const body = $("table1Body");
   if (!body) return;
@@ -255,7 +296,7 @@ function openTable1Zone(zoneCode) {
     existingHeader.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
-
+removeTable1PlanTotals();
   // Заголовок выбранной зоны
 const header = createZoneRow(zone.name, 16, zone.code);
 body.appendChild(header);
@@ -293,9 +334,11 @@ body.appendChild(header);
   `;
   body.appendChild(all);
 
-  bindEvents(body);
-  recalc();
-  savePlan();
+appendTable1PlanTotals();
+
+bindEvents(body);
+recalc();
+savePlan();
 }
   function addInitialTable2Rows() {
     const body = $("table2Body");
@@ -560,9 +603,11 @@ function deleteTable1Zone(zoneCode) {
     currentTable1ZoneCode = "";
   }
 
-  updateTable1Hint();
-  recalc();
-  savePlan();
+updateTable1Hint();
+appendTable1PlanTotals();
+
+recalc();
+savePlan();
 }
 
 function deleteTable1Row(row) {
