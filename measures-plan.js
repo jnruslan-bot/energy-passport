@@ -638,16 +638,6 @@ $("showTable1ZoneBtn")?.addEventListener("click", () => {
     $("addTable1RowBtn")?.addEventListener("click", addTable1Row);
     $("addTable2RowBtn")?.addEventListener("click", addTable2Row);
     $("addTable3RowBtn")?.addEventListener("click", addTable3Row);
-$("deleteTable1ZoneBtn")?.addEventListener("click", () => {
-  const zoneCode = $("table1ZoneSelect")?.value || "";
-
-  if (!zoneCode) {
-    alert("Сначала выберите зону энергосбережения для удаления.");
-    return;
-  }
-
-  deleteTable1Zone(zoneCode);
-});
 
 $("table1Body")?.addEventListener("click", (event) => {
   const deleteZoneBtn = event.target.closest(".delete-zone-btn");
