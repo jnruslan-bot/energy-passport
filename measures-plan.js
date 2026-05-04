@@ -464,7 +464,7 @@ body.appendChild(header);
   const body = $("table1Body");
   if (!body) return;
 
-  const zoneCode = currentTable1ZoneCode || $("table1ZoneSelect")?.value;
+  const zoneCode = $("table1ZoneSelect")?.value || currentTable1ZoneCode;
   const zone = zoneByCode(zoneCode);
 
   if (!zone) {
@@ -611,11 +611,12 @@ function deleteTable1Row(row) {
     loadPlan();
 $("showTable1ZoneBtn")?.addEventListener("click", () => {
   const zoneCode = $("table1ZoneSelect")?.value || "";
-  openTable1Zone(zoneCode);
-});
 
-$("table1ZoneSelect")?.addEventListener("change", () => {
-  const zoneCode = $("table1ZoneSelect")?.value || "";
+  if (!zoneCode) {
+    alert("Сначала выберите зону энергосбережения.");
+    return;
+  }
+
   openTable1Zone(zoneCode);
 });
     $("planYearFrom")?.addEventListener("input", () => {
@@ -638,7 +639,13 @@ $("table1ZoneSelect")?.addEventListener("change", () => {
     $("addTable2RowBtn")?.addEventListener("click", addTable2Row);
     $("addTable3RowBtn")?.addEventListener("click", addTable3Row);
 $("deleteTable1ZoneBtn")?.addEventListener("click", () => {
-  const zoneCode = currentTable1ZoneCode || $("table1ZoneSelect")?.value || "";
+  const zoneCode = $("table1ZoneSelect")?.value || "";
+
+  if (!zoneCode) {
+    alert("Сначала выберите зону энергосбережения для удаления.");
+    return;
+  }
+
   deleteTable1Zone(zoneCode);
 });
 
