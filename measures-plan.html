@@ -138,6 +138,44 @@
       padding: 10px;
       background: #fafafa;
     }
+        .zone-title-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .delete-zone-btn,
+    .delete-row-btn {
+      cursor: pointer;
+      border: 1px solid #999;
+      background: #f7f7f7;
+      padding: 2px 6px;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .delete-zone-btn:hover,
+    .delete-row-btn:hover {
+      background: #eee;
+    }
+
+    .code-cell-wrap {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .code-cell-wrap input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .delete-row-btn {
+      width: 24px;
+      flex: 0 0 24px;
+    }
   </style>
 </head>
 
@@ -203,8 +241,9 @@
     <option value="ППК.">Переподготовка и повышение квалификации персонала</option>
   </select>
 
-  <button id="showTable1ZoneBtn">Добавить / открыть зону</button>
-  <button id="addTable1RowBtn">+ Добавить мероприятие</button>
+<button id="showTable1ZoneBtn">Добавить / открыть зону</button>
+<button id="addTable1RowBtn">+ Добавить мероприятие</button>
+<button id="deleteTable1ZoneBtn">Удалить выбранную зону</button>
 </div>
 
 <div id="table1ZoneHint" class="note">

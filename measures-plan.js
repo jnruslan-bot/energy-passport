@@ -100,12 +100,27 @@ let currentTable1ZoneCode = "";
 function zoneByCode(code) {
   return ZONES.find((z) => z.code === code) || null;
 }
-  function createZoneRow(zoneName, colCount) {
-    const tr = document.createElement("tr");
-    tr.className = "zone-row";
-    tr.innerHTML = `<td colspan="${colCount}">Зона энергосбережения: ${escapeHtml(zoneName)}</td>`;
-    return tr;
+function createZoneRow(zoneName, colCount, zoneCode = "") {
+  const tr = document.createElement("tr");
+  tr.className = "zone-row";
+
+  if (zoneCode) {
+    tr.dataset.zoneHeader = zoneCode;
   }
+
+  tr.innerHTML = `
+    <td colspan="${colCount}">
+      <div class="zone-title-wrap">
+        <span>Зона энергосбережения: ${escapeHtml(zoneName)}</span>
+        <button type="button" class="delete-zone-btn" data-zone-delete="${escapeHtml(zoneCode)}">
+          Удалить зону
+        </button>
+      </div>
+    </td>
+  `;
+
+  return tr;
+}
 
   function createTable1Row(zone, index, data = {}) {
     const tr = document.createElement("tr");
@@ -114,7 +129,12 @@ function zoneByCode(code) {
     const code = data.code || `${zone.code}${String(index).padStart(2, "0")}`;
 
     tr.innerHTML = `
-      <td>${input(code, "t1-code")}</td>
+     <td>
+  <div class="code-cell-wrap">
+    ${input(code, "t1-code")}
+    <button type="button" class="delete-row-btn" title="Удалить мероприятие">×</button>
+  </div>
+</td>
       <td>${textarea(data.measure, "t1-measure")}</td>
       <td>${input(data.period, "t1-period")}</td>
 
@@ -237,9 +257,8 @@ function openTable1Zone(zoneCode) {
   }
 
   // Заголовок выбранной зоны
-  const header = createZoneRow(zone.name, 16);
-  header.dataset.zoneHeader = zone.code;
-  body.appendChild(header);
+const header = createZoneRow(zone.name, 16, zone.code);
+body.appendChild(header);
 
   // Первые три строки мероприятий по выбранной зоне
   body.appendChild(createTable1Row(zone, 1));
@@ -477,7 +496,93 @@ function openTable1Zone(zoneCode) {
   recalc();
   savePlan();
 }
+function renumberTable1Zone(zoneCode) {
+  const zone = zoneByCode(zoneCode);
+  if (!zone) return;
 
+  const rows = Array.from(document.querySelectorAll(`#table1Body tr[data-zone="${zone.code}"]`));
+
+  rows.forEach((tr, index) => {
+    const codeInput = tr.querySelector(".t1-code");
+    if (codeInput) {
+      codeInput.value = `${zone.code}${String(index + 1).padStart(2, "0")}`;
+    }
+  });
+}
+
+function updateTable1Hint() {
+  const body = $("table1Body");
+  const hint = $("table1ZoneHint");
+  if (!body || !hint) return;
+
+  const hasAnyZone = Boolean(body.querySelector(".zone-row"));
+
+  hint.style.display = hasAnyZone ? "none" : "block";
+  if (!hasAnyZone) {
+    hint.textContent = "Выберите зону энергосбережения, чтобы открыть таблицу для заполнения мероприятий по выбранной зоне.";
+  }
+}
+
+function deleteTable1Zone(zoneCode) {
+  const body = $("table1Body");
+  const zone = zoneByCode(zoneCode);
+
+  if (!body || !zone) {
+    alert("Сначала выберите зону энергосбережения для удаления.");
+    return;
+  }
+
+  const header = body.querySelector(`tr[data-zone-header="${zone.code}"]`);
+
+  if (!header) {
+    alert("Выбранная зона пока не добавлена в план.");
+    return;
+  }
+
+  const ok = confirm(`Удалить зону "${zone.name}" со всеми мероприятиями?`);
+  if (!ok) return;
+
+  let row = header;
+
+  while (row) {
+    const next = row.nextElementSibling;
+
+    row.remove();
+
+    if (!next || next.dataset.zoneHeader) {
+      break;
+    }
+
+    row = next;
+  }
+
+  if (currentTable1ZoneCode === zone.code) {
+    currentTable1ZoneCode = "";
+  }
+
+  updateTable1Hint();
+  recalc();
+  savePlan();
+}
+
+function deleteTable1Row(row) {
+  if (!row) return;
+
+  const zoneCode = row.dataset.zone;
+  const zone = zoneByCode(zoneCode);
+
+  const ok = confirm("Удалить выбранное мероприятие?");
+  if (!ok) return;
+
+  row.remove();
+
+  if (zone) {
+    renumberTable1Zone(zone.code);
+  }
+
+  recalc();
+  savePlan();
+}
   function addTable2Row() {
     const body = $("table2Body");
     if (!body) return;
@@ -532,7 +637,25 @@ $("table1ZoneSelect")?.addEventListener("change", () => {
     $("addTable1RowBtn")?.addEventListener("click", addTable1Row);
     $("addTable2RowBtn")?.addEventListener("click", addTable2Row);
     $("addTable3RowBtn")?.addEventListener("click", addTable3Row);
+$("deleteTable1ZoneBtn")?.addEventListener("click", () => {
+  const zoneCode = currentTable1ZoneCode || $("table1ZoneSelect")?.value || "";
+  deleteTable1Zone(zoneCode);
+});
 
+$("table1Body")?.addEventListener("click", (event) => {
+  const deleteZoneBtn = event.target.closest(".delete-zone-btn");
+  if (deleteZoneBtn) {
+    const zoneCode = deleteZoneBtn.dataset.zoneDelete || "";
+    deleteTable1Zone(zoneCode);
+    return;
+  }
+
+  const deleteRowBtn = event.target.closest(".delete-row-btn");
+  if (deleteRowBtn) {
+    const row = deleteRowBtn.closest("tr[data-zone]");
+    deleteTable1Row(row);
+  }
+});
     bindEvents(document);
     recalc();
   });
