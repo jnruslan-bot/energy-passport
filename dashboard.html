@@ -20,13 +20,14 @@
   <h1>Рабочая зона</h1>
   <p>Пользователь авторизован</p>
 
-  <div class="actions">
-    <button onclick="goToEnergyPassport()">Энергопаспорт</button>
-    <button onclick="goToTER()">Потребление ТЭР</button>
-    <button onclick="goToMeasures()">Мероприятия</button>
+<div class="actions">
+  <button onclick="goToEnergyPassport()">Энергопаспорт</button>
+  <button onclick="goToTER()">Потребление ТЭР</button>
+  <button onclick="goToMeasures()">Мероприятия</button>
+  <button onclick="goToMeasuresPlan()">План мероприятий</button>
 
-    <a id="adminLink" href="admin.html" style="display:none;">Администратор</a>
-  </div>
+  <a id="adminLink" href="admin.html" style="display:none;">Администратор</a>
+</div>
 
   <br><br>
 
@@ -34,18 +35,22 @@
 
   <script type="module" src="guard.js"></script>
 
-  <script>
-    function goToEnergyPassport() {
-      window.location.href = "energy-passport-select.html";
-    }
+<script>
+  function goToEnergyPassport() {
+    window.location.href = "energy-passport-select.html";
+  }
 
-    function goToTER() {
-      window.location.href = "ter-consumption.html";
-    }
+  function goToTER() {
+    window.location.href = "ter-consumption.html";
+  }
 
-    function goToMeasures() {
-      window.location.href = "measures.html";
-    }
-  </script>
+  function goToMeasures() {
+    window.location.href = "measures.html";
+  }
+
+  function goToMeasuresPlan() {
+    window.location.href = "measures-plan.html";
+  }
+</script>
 </body>
 </html>
