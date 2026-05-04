@@ -18,6 +18,8 @@
     { name: "Переподготовка и повышение квалификации персонала", code: "ППК." }
   ];
 
+let currentTable1ZoneCode = "";
+
   const RESOURCES = [
     { name: "Электрическая энергия", unit: "кВт·ч" },
     { name: "Тепловая энергия", unit: "Гкал" },
@@ -95,7 +97,9 @@
     const found = RESOURCES.find((r) => r.name === resourceName);
     return found ? found.unit : "";
   }
-
+function zoneByCode(code) {
+  return ZONES.find((z) => z.code === code) || null;
+}
   function createZoneRow(zoneName, colCount) {
     const tr = document.createElement("tr");
     tr.className = "zone-row";
@@ -187,67 +191,77 @@
   }
 
   function addInitialTable1Rows() {
-    const body = $("table1Body");
-    if (!body) return;
+  const body = $("table1Body");
+  if (!body) return;
 
+  body.innerHTML = "";
+
+  const hint = $("table1ZoneHint");
+  if (hint) {
+    hint.style.display = "block";
+    hint.textContent = "Выберите зону энергосбережения, чтобы открыть таблицу для заполнения мероприятий по выбранной зоне.";
+  }
+}
+function openTable1Zone(zoneCode) {
+  const body = $("table1Body");
+  if (!body) return;
+
+  const zone = zoneByCode(zoneCode);
+
+  if (!zone) {
     body.innerHTML = "";
+    currentTable1ZoneCode = "";
 
-    ZONES.forEach((zone) => {
-      body.appendChild(createZoneRow(zone.name, 16));
-      body.appendChild(createTable1Row(zone, 1));
-      body.appendChild(createTable1Row(zone, 2));
-      body.appendChild(createTable1Row(zone, 3));
+    const hint = $("table1ZoneHint");
+    if (hint) {
+      hint.style.display = "block";
+      hint.textContent = "Выберите зону энергосбережения, чтобы открыть таблицу для заполнения мероприятий по выбранной зоне.";
+    }
 
-      const total = document.createElement("tr");
-      total.className = "total-row";
-      total.innerHTML = `
-        <td colspan="3" class="left">Итого:</td>
-        <td colspan="5"></td>
-        <td></td>
-        <td colspan="5"></td>
-        <td></td>
-        <td></td>
-      `;
-      body.appendChild(total);
-
-      const all = document.createElement("tr");
-      all.className = "total-row";
-      all.innerHTML = `
-        <td colspan="3" class="left">Всего:</td>
-        <td colspan="5"></td>
-        <td></td>
-        <td colspan="5"></td>
-        <td></td>
-        <td></td>
-      `;
-      body.appendChild(all);
-    });
-
-    const planTotal = document.createElement("tr");
-    planTotal.className = "total-row";
-    planTotal.innerHTML = `
-      <td colspan="3" class="left">Итого по плану</td>
-      <td colspan="5"></td>
-      <td></td>
-      <td colspan="5"></td>
-      <td></td>
-      <td></td>
-    `;
-    body.appendChild(planTotal);
-
-    const planAll = document.createElement("tr");
-    planAll.className = "total-row";
-    planAll.innerHTML = `
-      <td colspan="3" class="left">Всего по плану</td>
-      <td colspan="5"></td>
-      <td></td>
-      <td colspan="5"></td>
-      <td></td>
-      <td></td>
-    `;
-    body.appendChild(planAll);
+    return;
   }
 
+  currentTable1ZoneCode = zone.code;
+  body.innerHTML = "";
+
+  const hint = $("table1ZoneHint");
+  if (hint) {
+    hint.style.display = "none";
+  }
+
+  body.appendChild(createZoneRow(zone.name, 16));
+  body.appendChild(createTable1Row(zone, 1));
+  body.appendChild(createTable1Row(zone, 2));
+  body.appendChild(createTable1Row(zone, 3));
+
+  const total = document.createElement("tr");
+  total.className = "total-row";
+  total.innerHTML = `
+    <td colspan="3" class="left">Итого:</td>
+    <td colspan="5"></td>
+    <td></td>
+    <td colspan="5"></td>
+    <td></td>
+    <td></td>
+  `;
+  body.appendChild(total);
+
+  const all = document.createElement("tr");
+  all.className = "total-row";
+  all.innerHTML = `
+    <td colspan="3" class="left">Всего:</td>
+    <td colspan="5"></td>
+    <td></td>
+    <td colspan="5"></td>
+    <td></td>
+    <td></td>
+  `;
+  body.appendChild(all);
+
+  bindEvents(body);
+  recalc();
+  savePlan();
+}
   function addInitialTable2Rows() {
     const body = $("table2Body");
     if (!body) return;
@@ -412,16 +426,35 @@
   }
 
   function addTable1Row() {
-    const body = $("table1Body");
-    if (!body) return;
+  const body = $("table1Body");
+  if (!body) return;
 
-    const zone = ZONES[0];
-    const rows = Array.from(body.querySelectorAll("tr[data-zone='ЭиОс.']"));
-    const index = rows.length + 1;
+  const zoneCode = currentTable1ZoneCode || $("table1ZoneSelect")?.value;
+  const zone = zoneByCode(zoneCode);
 
-    body.insertBefore(createTable1Row(zone, index), body.firstChild?.nextSibling ?? null);
-    savePlan();
+  if (!zone) {
+    alert("Сначала выберите зону энергосбережения.");
+    return;
   }
+
+  currentTable1ZoneCode = zone.code;
+
+  const rows = Array.from(body.querySelectorAll(`tr[data-zone="${zone.code}"]`));
+  const index = rows.length + 1;
+
+  const totalRow = body.querySelector(".total-row");
+  const newRow = createTable1Row(zone, index);
+
+  if (totalRow) {
+    body.insertBefore(newRow, totalRow);
+  } else {
+    body.appendChild(newRow);
+  }
+
+  bindEvents(newRow);
+  recalc();
+  savePlan();
+}
 
   function addTable2Row() {
     const body = $("table2Body");
@@ -449,7 +482,15 @@
     addInitialTable3Rows();
 
     loadPlan();
+$("showTable1ZoneBtn")?.addEventListener("click", () => {
+  const zoneCode = $("table1ZoneSelect")?.value || "";
+  openTable1Zone(zoneCode);
+});
 
+$("table1ZoneSelect")?.addEventListener("change", () => {
+  const zoneCode = $("table1ZoneSelect")?.value || "";
+  openTable1Zone(zoneCode);
+});
     $("planYearFrom")?.addEventListener("input", () => {
       updateYearHeaders();
       savePlan();

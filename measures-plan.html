@@ -188,9 +188,28 @@
     Таблица 1 содержит код и номер мероприятия, наименование мероприятия, период реализации, планируемые расходы по годам, единицу измерения, объем планируемого снижения потребления энергетических ресурсов, срок окупаемости и отметку о выполнении.
   </div>
 
-  <div class="toolbar">
-    <button id="addTable1RowBtn">+ Добавить мероприятие в Таблицу 1</button>
-  </div>
+<div class="toolbar">
+  <label for="table1ZoneSelect"><b>Зона энергосбережения:</b></label>
+
+  <select id="table1ZoneSelect" style="max-width:420px;">
+    <option value="">— выберите зону —</option>
+    <option value="ЭиОс.">Электроснабжение и освещение</option>
+    <option value="ТиОт.">Теплоснабжение и отопление</option>
+    <option value="ВКУ.">Вентиляция, кондиционирование, увлажнение</option>
+    <option value="ВиВ.">Водоснабжение и водоотведение</option>
+    <option value="ТО.">Технологическое оборудование</option>
+    <option value="ПУ.">Приборы и средства учета и контроля, в том числе автоматизированные системы</option>
+    <option value="ЭМ.">Энергоменеджмент</option>
+    <option value="ППК.">Переподготовка и повышение квалификации персонала</option>
+  </select>
+
+  <button id="showTable1ZoneBtn">Открыть зону</button>
+  <button id="addTable1RowBtn">+ Добавить мероприятие</button>
+</div>
+
+<div id="table1ZoneHint" class="note">
+  Выберите зону энергосбережения, чтобы открыть таблицу для заполнения мероприятий по выбранной зоне.
+</div>
 
   <div class="table-wrap">
     <table id="table1">
