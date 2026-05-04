@@ -112,9 +112,16 @@ function createZoneRow(zoneName, colCount, zoneCode = "") {
     <td colspan="${colCount}">
       <div class="zone-title-wrap">
         <span>Зона энергосбережения: ${escapeHtml(zoneName)}</span>
-        <button type="button" class="delete-zone-btn" data-zone-delete="${escapeHtml(zoneCode)}">
-          Удалить зону
-        </button>
+
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" class="add-zone-row-btn" data-zone-add="${escapeHtml(zoneCode)}">
+            + Добавить мероприятие
+          </button>
+
+          <button type="button" class="delete-zone-btn" data-zone-delete="${escapeHtml(zoneCode)}">
+            Удалить зону
+          </button>
+        </div>
       </div>
     </td>
   `;
@@ -572,11 +579,11 @@ function recalc() {
     location.reload();
   }
 
-  function addTable1Row() {
+  function addTable1Row(zoneCodeFromButton = "") {
   const body = $("table1Body");
   if (!body) return;
 
-  const zoneCode = $("table1ZoneSelect")?.value || currentTable1ZoneCode;
+  const zoneCode = zoneCodeFromButton || $("table1ZoneSelect")?.value || currentTable1ZoneCode;
   const zone = zoneByCode(zoneCode);
 
   if (!zone) {
@@ -586,8 +593,9 @@ function recalc() {
 
   currentTable1ZoneCode = zone.code;
 
-  // Если зона еще не открыта — сначала создаем ее
   const existingHeader = body.querySelector(`tr[data-zone-header="${zone.code}"]`);
+
+  // Если зона еще не добавлена, сначала создаём её с базовыми строками
   if (!existingHeader) {
     openTable1Zone(zone.code);
   }
@@ -595,18 +603,28 @@ function recalc() {
   const rows = Array.from(body.querySelectorAll(`tr[data-zone="${zone.code}"]`));
   const index = rows.length + 1;
 
-  const totalRow = body.querySelector(`tr[data-zone-total="${zone.code}"]`);
   const newRow = createTable1Row(zone, index);
+
+  // Новое мероприятие вставляем строго перед строкой "Итого" выбранной зоны
+  const totalRow = body.querySelector(`tr[data-zone-total="${zone.code}"]`);
 
   if (totalRow) {
     body.insertBefore(newRow, totalRow);
   } else {
-    body.appendChild(newRow);
+    const zoneAllRow = body.querySelector(`tr[data-zone-all="${zone.code}"]`);
+    if (zoneAllRow) {
+      body.insertBefore(newRow, zoneAllRow);
+    } else {
+      body.appendChild(newRow);
+    }
   }
 
+  renumberTable1Zone(zone.code);
   bindEvents(newRow);
   recalc();
   savePlan();
+
+  newRow.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 function renumberTable1Zone(zoneCode) {
   const zone = zoneByCode(zoneCode);
@@ -661,9 +679,9 @@ function deleteTable1Zone(zoneCode) {
 
     row.remove();
 
-    if (!next || next.dataset.zoneHeader) {
-      break;
-    }
+if (!next || next.dataset.zoneHeader || next.dataset.planTotalRow) {
+  break;
+}
 
     row = next;
   }
@@ -749,11 +767,17 @@ $("showTable1ZoneBtn")?.addEventListener("click", () => {
 
     $("clearPlanBtn")?.addEventListener("click", clearPlan);
 
-    $("addTable1RowBtn")?.addEventListener("click", addTable1Row);
     $("addTable2RowBtn")?.addEventListener("click", addTable2Row);
     $("addTable3RowBtn")?.addEventListener("click", addTable3Row);
 
 $("table1Body")?.addEventListener("click", (event) => {
+  const addZoneRowBtn = event.target.closest(".add-zone-row-btn");
+  if (addZoneRowBtn) {
+    const zoneCode = addZoneRowBtn.dataset.zoneAdd || "";
+    addTable1Row(zoneCode);
+    return;
+  }
+
   const deleteZoneBtn = event.target.closest(".delete-zone-btn");
   if (deleteZoneBtn) {
     const zoneCode = deleteZoneBtn.dataset.zoneDelete || "";
