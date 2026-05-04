@@ -263,6 +263,41 @@ function appendTable1PlanTotals() {
   `;
   body.appendChild(planAll);
 }
+function createTable1SummaryRow(label, type, zoneCode = "") {
+  const tr = document.createElement("tr");
+  tr.className = "total-row";
+
+  if (type === "zoneTotal") {
+    tr.dataset.zoneTotal = zoneCode;
+  }
+
+  if (type === "zoneAll") {
+    tr.dataset.zoneAll = zoneCode;
+  }
+
+  tr.innerHTML = `
+    <td colspan="3" class="left">${escapeHtml(label)}</td>
+
+    <td class="t1-sum-cost">0.000</td>
+    <td class="t1-sum-cost">0.000</td>
+    <td class="t1-sum-cost">0.000</td>
+    <td class="t1-sum-cost">0.000</td>
+    <td class="t1-sum-cost">0.000</td>
+
+    <td></td>
+
+    <td class="t1-sum-saving">0.000</td>
+    <td class="t1-sum-saving">0.000</td>
+    <td class="t1-sum-saving">0.000</td>
+    <td class="t1-sum-saving">0.000</td>
+    <td class="t1-sum-saving">0.000</td>
+
+    <td></td>
+    <td></td>
+  `;
+
+  return tr;
+}
 function openTable1Zone(zoneCode) {
   const body = $("table1Body");
   if (!body) return;
@@ -306,33 +341,8 @@ body.appendChild(header);
   body.appendChild(createTable1Row(zone, 2));
   body.appendChild(createTable1Row(zone, 3));
 
-  // Итого по зоне
-  const total = document.createElement("tr");
-  total.className = "total-row";
-  total.dataset.zoneTotal = zone.code;
-  total.innerHTML = `
-    <td colspan="3" class="left">Итого:</td>
-    <td colspan="5"></td>
-    <td></td>
-    <td colspan="5"></td>
-    <td></td>
-    <td></td>
-  `;
-  body.appendChild(total);
-
-  // Всего по зоне
-  const all = document.createElement("tr");
-  all.className = "total-row";
-  all.dataset.zoneAll = zone.code;
-  all.innerHTML = `
-    <td colspan="3" class="left">Всего:</td>
-    <td colspan="5"></td>
-    <td></td>
-    <td colspan="5"></td>
-    <td></td>
-    <td></td>
-  `;
-  body.appendChild(all);
+   body.appendChild(createTable1SummaryRow("Итого:", "zoneTotal", zone.code));
+  body.appendChild(createTable1SummaryRow("Всего:", "zoneAll", zone.code));
 
 appendTable1PlanTotals();
 
@@ -419,7 +429,65 @@ savePlan();
       return sum + (Number.isFinite(n) ? n : 0);
     }, 0);
   }
+function sumTable1Inputs(rows, selector) {
+  const totals = [0, 0, 0, 0, 0];
 
+  rows.forEach((tr) => {
+    const inputs = Array.from(tr.querySelectorAll(selector));
+
+    inputs.forEach((input, index) => {
+      if (index > 4) return;
+
+      const n = toNumber(input.value);
+      if (Number.isFinite(n)) {
+        totals[index] += n;
+      }
+    });
+  });
+
+  return totals;
+}
+
+function writeTable1Summary(row, costTotals, savingTotals) {
+  if (!row) return;
+
+  const costCells = Array.from(row.querySelectorAll(".t1-sum-cost"));
+  const savingCells = Array.from(row.querySelectorAll(".t1-sum-saving"));
+
+  costCells.forEach((cell, index) => {
+    cell.textContent = fmt(costTotals[index] || 0, 3);
+  });
+
+  savingCells.forEach((cell, index) => {
+    cell.textContent = fmt(savingTotals[index] || 0, 3);
+  });
+}
+
+function recalcTable1() {
+  const body = $("table1Body");
+  if (!body) return;
+
+  const zoneCodes = Array.from(
+    new Set(
+      Array.from(body.querySelectorAll("tr[data-zone]"))
+        .map((tr) => tr.dataset.zone)
+        .filter(Boolean)
+    )
+  );
+
+  zoneCodes.forEach((zoneCode) => {
+    const rows = Array.from(body.querySelectorAll(`tr[data-zone="${zoneCode}"]`));
+
+    const costTotals = sumTable1Inputs(rows, ".t1-cost");
+    const savingTotals = sumTable1Inputs(rows, ".t1-saving");
+
+    const zoneTotalRow = body.querySelector(`tr[data-zone-total="${zoneCode}"]`);
+    const zoneAllRow = body.querySelector(`tr[data-zone-all="${zoneCode}"]`);
+
+    writeTable1Summary(zoneTotalRow, costTotals, savingTotals);
+    writeTable1Summary(zoneAllRow, costTotals, savingTotals);
+  });
+}
   function recalcTable2() {
     document.querySelectorAll("#table2Body tr").forEach((tr) => {
       if (tr.classList.contains("total-row")) return;
@@ -435,10 +503,11 @@ savePlan();
     });
   }
 
-  function recalc() {
-    updateYearHeaders();
-    recalcTable2();
-  }
+function recalc() {
+  updateYearHeaders();
+  recalcTable1();
+  recalcTable2();
+}
 
   function collectRows(selector, mapper) {
     return Array.from(document.querySelectorAll(selector))
