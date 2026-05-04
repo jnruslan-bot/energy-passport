@@ -209,11 +209,12 @@ function openTable1Zone(zoneCode) {
   const zone = zoneByCode(zoneCode);
 
   if (!zone) {
-    body.innerHTML = "";
     currentTable1ZoneCode = "";
 
+    const hasAnyZone = body.querySelector(".zone-row");
+
     const hint = $("table1ZoneHint");
-    if (hint) {
+    if (hint && !hasAnyZone) {
       hint.style.display = "block";
       hint.textContent = "Выберите зону энергосбережения, чтобы открыть таблицу для заполнения мероприятий по выбранной зоне.";
     }
@@ -222,20 +223,33 @@ function openTable1Zone(zoneCode) {
   }
 
   currentTable1ZoneCode = zone.code;
-  body.innerHTML = "";
 
   const hint = $("table1ZoneHint");
   if (hint) {
     hint.style.display = "none";
   }
 
-  body.appendChild(createZoneRow(zone.name, 16));
+  // Если такая зона уже добавлена — второй раз её не создаём
+  const existingHeader = body.querySelector(`tr[data-zone-header="${zone.code}"]`);
+  if (existingHeader) {
+    existingHeader.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  // Заголовок выбранной зоны
+  const header = createZoneRow(zone.name, 16);
+  header.dataset.zoneHeader = zone.code;
+  body.appendChild(header);
+
+  // Первые три строки мероприятий по выбранной зоне
   body.appendChild(createTable1Row(zone, 1));
   body.appendChild(createTable1Row(zone, 2));
   body.appendChild(createTable1Row(zone, 3));
 
+  // Итого по зоне
   const total = document.createElement("tr");
   total.className = "total-row";
+  total.dataset.zoneTotal = zone.code;
   total.innerHTML = `
     <td colspan="3" class="left">Итого:</td>
     <td colspan="5"></td>
@@ -246,8 +260,10 @@ function openTable1Zone(zoneCode) {
   `;
   body.appendChild(total);
 
+  // Всего по зоне
   const all = document.createElement("tr");
   all.className = "total-row";
+  all.dataset.zoneAll = zone.code;
   all.innerHTML = `
     <td colspan="3" class="left">Всего:</td>
     <td colspan="5"></td>
@@ -439,10 +455,16 @@ function openTable1Zone(zoneCode) {
 
   currentTable1ZoneCode = zone.code;
 
+  // Если зона еще не открыта — сначала создаем ее
+  const existingHeader = body.querySelector(`tr[data-zone-header="${zone.code}"]`);
+  if (!existingHeader) {
+    openTable1Zone(zone.code);
+  }
+
   const rows = Array.from(body.querySelectorAll(`tr[data-zone="${zone.code}"]`));
   const index = rows.length + 1;
 
-  const totalRow = body.querySelector(".total-row");
+  const totalRow = body.querySelector(`tr[data-zone-total="${zone.code}"]`);
   const newRow = createTable1Row(zone, index);
 
   if (totalRow) {
